@@ -1,3 +1,12 @@
+// @ts-nocheck
+// Recovered as an ES module for build 15. Preserve saved-state and replay semantics.
+import { $l, Cu, Ql, SWAnimationFiles, SWBuildingSize, SWBuildingTile, SWCoastHit, SWDirectionalFiles, SWDrawBattleTerrain, SWDrawCapitalTerrain, SWDrawCitizen, SWDrawCivicProject, SWDrawCoast, SWDrawCommanderAccessory, SWDrawDeploymentEdge, SWDrawEscortCue, SWDrawGarden, SWDrawHarborAppearance, SWDrawLandmark, SWDrawOrnament, SWDrawPaintedUnit, SWDrawProjectile, SWDrawRoads, SWDrawTownAppearance, SWDrawTrebuchet, SWDrawWall, SWDrawWorldTerrain, SWTroopTier, Su, Tu, Xc, Yl, Zl, _u, vu, wu, xu, yu } from "../../frontend/legacy/presentation.js";
+import { SWBattleEffectBudget15, SWSelectCombatEffects15, SWDrawBuildingDamage15 as SWDrawBuildingDamage, SWDrawCombatEvent15 as SWDrawCombatEvent, SWDrawDeploymentCue17, SWDrawNavalIntent17 } from '../build15/combat-presentation.js';
+import { SWLandingCarrier17, SWShotPose17, SWContactMotion17, SWNavalCommandTarget17 } from '../build17/combat.js';
+import { C, De, F, je, ue } from "../../frontend/vendor/runtime.js";
+import { SWCitizenPosition, SWDrawCollapse, SWDrawLandingEdge14, SWDrawLayoutOverlay14, SWDrawNavalUnit, SWDrawPaintedWorker, SWDrawSea14, SWDrawSeaGround14, SWDrawTroopRig14, SWDrawUnitFall, SWPresentationBudget15, SWPresentationImages15 } from "./render.js";
+import { Ac, Cc, J, Oc, SWCanPlace, SWCoast, Sl, Vc, sl } from "../../frontend/core/rules.js";
+import { SWBeginPointer14, SWDeploymentTarget14, SWGestureBridge14, SWInstallPointers14 } from "./gestures.js";
 function Eu({
   buildings: e,
   provinces: t = [],
@@ -30,9 +39,10 @@ function Eu({
   commanderLevel: te = 1,
   unitLevels: ne = {},
   navalSupport = null,
-  selectedTroop = null,
+  selectedTroop = null, selectedShip14 = null,
   reserveCount,
   defending = false,
+  staticPreview = false,
   city = {},
   appearance = null,
   fleetAppearance = null,
@@ -61,12 +71,14 @@ function Eu({
     swLastSelection = (0, C.useRef)(selectedTroop),
     swDeploy = (0, C.useRef)(ee),
     swPreview = (0, C.useRef)(null),
+    swDeploymentFeedback17 = (0, C.useRef)(null),
     swDeploymentState = (0, C.useRef)({active:T,selectedTroop,reserveCount});
   k.current.appearance=appearance;
   k.current.fleetAppearance=fleetAppearance||appearance;
   const swPresentationEvents=C.useRef(new Map()),swPresentationTime=C.useRef(-1);
   swDeploy.current=ee;
   swDeploymentState.current={active:T,selectedTroop,reserveCount};
+  C.useEffect(()=>{ye.current=[];swRenderPositions.current.clear();swPresentationEvents.current.clear();swPresentationTime.current=-1;swOrderAck.current=null;swDeploymentFeedback17.current=null;},[battleInput14?.seed,battleInput14?.createdAt]);
   const swCancelHold=()=>{clearTimeout(swGesture.current.hold);clearInterval(swGesture.current.repeat);swGesture.current.hold=null;swGesture.current.repeat=null;};
   (0,C.useEffect)(()=>()=>swCancelHold(),[]);
   (0,C.useEffect)(()=>{
@@ -150,6 +162,7 @@ function Eu({
     for (let [t, n] of Object.entries({
       ...SWDirectionalFiles,
       ...SWAnimationFiles,
+      coastalShips15: `build15/coastal-ships.png`,
       land: `valley`,
       coastLand: `coastal-valley.png`,
       worldLand: `sculpted-coast-v13.png`,
@@ -168,7 +181,7 @@ function Eu({
     }))
       _u(`/art/` + n + (n.includes(`.`) ? `` : `.webp`))
         .then((n) => {
-          e && ((k.current[t] = n), ae((e) => e + 1));
+          e && ((k.current[t] = n), SWPresentationImages15(k.current), ae((e) => e + 1));
         })
         .catch(() => {
           e && Me((e) => e + 1);
@@ -306,7 +319,8 @@ function Eu({
         }
         if (s) {
           o.restore();
-          SWDrawCollapse(o,e,k.current,i,g?performance.now()-g.born:2000,ve.current);
+          const animateCollapse=g&&ye.current.filter(event=>event.kind===`fall`).slice(-SWBattleEffectBudget15.activeCollapses).includes(g);
+          SWDrawCollapse(o,e,k.current,i,animateCollapse?performance.now()-g.born:2000,ve.current);
           return;
         }
         o.globalAlpha=t*(e.level===0?.55:1);
@@ -377,7 +391,7 @@ function Eu({
         }
       },
       ee = (e, t, n, r, i, a, s = !1, c, l = !1, u, d = 1, swAttackPhase = 0) => {
-        if(a&&u&&J[u]){const point=vu(e.x,e.y);SWDrawTroopRig14(o,{kind:u,level:d,x:point.x+(e.swHit?.x||0),y:point.y,scale:['ram','trebuchet','cannon'].includes(u)?1.25:1,heading:e.heading??(i?2.3:-.8),phase:ve.current?0:s?swAttackPhase:n,state:s?'attack':r?'walk':'idle',enemy:l});if(c!==undefined&&c<.85){o.fillStyle='#102936';o.fillRect(point.x-10,point.y-55,20,3);o.fillStyle=l?'#dc7368':'#7dcfc3';o.fillRect(point.x-10,point.y-55,20*Math.max(0,c),3)}return;}
+        if(a&&u&&J[u]){const point=vu(e.x,e.y);SWDrawTroopRig14(o,{kind:u,level:d,x:point.x+(ve.current?0:(e.swHit?.x||0)+(e.swRecoil?.x||0)),y:point.y+(ve.current?0:(e.swHit?.y||0)+(e.swRecoil?.y||0)),scale:['ram','trebuchet','cannon'].includes(u)?1.25:1,heading:e.heading??(i?2.3:-.8),phase:ve.current?0:s?swAttackPhase:n,state:s?'attack':r?'walk':'idle',enemy:l,images:k.current});if(c!==undefined&&c<.85){o.fillStyle='#102936';o.fillRect(point.x-10,point.y-55,20,3);o.fillStyle=l?'#dc7368':'#7dcfc3';o.fillRect(point.x-10,point.y-55,20*Math.max(0,c),3)}return;}
         let f = vu(e.x, e.y),
           p = t === 7,
           m = u === `trebuchet` ? 72 : Zl[u] !== void 0 ? (u === `ram` || u === `knight` ? 56 : 48) : p ? 60 : a ? 52 : 35;
@@ -456,12 +470,19 @@ function Eu({
           (o.fillStyle = l ? `#f06c5e` : `#61b8ff`),
           o.fillRect(f.x - 10, f.y - m - 5, 20 * Math.max(0, c), 3));
       },
-      E = (e, t, n, r = !1, i = !1, a, s = 1) => {
+      E = (e, t, n, r = !1, i = !1, a, s = 1, home = false) => {
         let c = vu(e.x, e.y),
           l = k.current.commanders,
           u = Ql.commanders[Oc[t].sprite + (i ? 3 : 0)];
-        (o.save(),
-          o.translate(c.x, c.y),
+        o.save();
+        o.translate(c.x, c.y);
+        if(home){
+          o.fillStyle = '#25271950';
+          o.beginPath();
+          o.ellipse(0,.7,7.5,2.6,-.12,0,Math.PI*2);
+          o.fill();
+        }else{
+          (
           (o.fillStyle =
             s >= 8 ? `#ebc15b99` : s >= 5 ? `#b9d8f099` : `#dfbb6580`),
           o.beginPath(),
@@ -476,16 +497,17 @@ function Eu({
             o.lineTo(Math.cos(t) * (18 + s), Math.sin(t) * (7 + s * 0.3)),
             o.stroke());
         }
+        }
         r &&
           !ve.current &&
           (o.translate(0, -Math.abs(Math.sin(n * 7)) * 2),
           o.rotate(Math.sin(n * 7) * 0.025));
-        let d = 65 * (1 + 0.018 * (s - 1)),
+        let d = home ? 38 * (1 + .004 * (s - 1)) : 65 * (1 + 0.018 * (s - 1)),
           f = (d * u[2]) / u[3];
         (l && o.drawImage(l, ...u, -f / 2, -d, f, d),
           o.restore(),
           SWDrawCommanderAccessory(o,c,fleetAppearance||appearance,d,n),
-          a === void 0
+          home ? void 0 : a === void 0
             ? ((o.fillStyle = `#17304bed`),
               o.beginPath(),
               o.roundRect(c.x - 36, c.y + 7, 72, 17, 5),
@@ -500,7 +522,7 @@ function Eu({
               o.fillRect(c.x - 16, c.y - 72, 32 * Math.max(0, a), 4)));
       },
       D = (r) => {
-        if (((d = requestAnimationFrame(D)), document.hidden || r - f < 15))
+        if (((d = staticPreview ? 0 : requestAnimationFrame(D)), (!staticPreview && document.hidden) || r - f < 15))
           return;
         const swDelta = Math.min(.05, Math.max(0,(r-swLastPaint)/1000)); swLastPaint=r;
         f = r;
@@ -513,6 +535,7 @@ function Eu({
           } = be.current,
           A = Math.min(O?.time ?? re + .5, re + (Math.max(0, r - ae) / 1e3) * ie);
         swFrameUnits=new Map(a?.units.map(u=>[u.id,u])||[]);
+        if(a&&A<swPresentationTime.current-.1){swPresentationEvents.current.clear();ye.current=[];swRenderPositions.current.clear();}
         if (a && a.time !== p) {
           if (p >= 0 && a.time > p) {
             for (let e of a.units) {
@@ -588,7 +611,13 @@ function Eu({
         const navalUnits=a?.units.filter(unit=>unit.naval)||[];
         for(const unit of navalUnits){
           const sink=ye.current.find(event=>event.kind===`sink`&&event.x===unit.x&&event.y===unit.y),next=O?.units.find(v=>v.id===unit.id)||unit,progress=O&&O.time>a.time?Math.max(0,Math.min(1,(A-a.time)/(O.time-a.time))):0,position=unit.hp>0?{...unit,x:unit.x+(next.x-unit.x)*progress,y:unit.y+(next.y-unit.y)*progress}:unit;
-          SWDrawNavalUnit(o,position,k.current,j,unit.sunkAt!==undefined?(A-unit.sunkAt)*1000:sink?r-sink.born:2000,ve.current);SWDrawEscortCue(o,position,a?.objective,j,Pe,ve.current);
+          const shot=[...(a.shots||[]),...(O?.shots||[])].find(shot=>shot.sourceId===unit.id&&SWShotPose17(shot,A,'naval')),pose=SWShotPose17(shot,A,'naval');
+          const hit=[...(a.events||[]),...(O?.events||[])].find(event=>event.targetId===unit.id&&A>=event.time&&A-event.time<.22),contact=SWContactMotion17(hit,A,ve.current);
+          const heading=shot?.heading??unit.heading??0,recoil=ve.current?0:pose?.recoil||0,dx=Math.cos(heading)-Math.sin(heading),dy=(Math.cos(heading)+Math.sin(heading))*.5,length=Math.hypot(dx,dy)||1;
+          o.save();o.translate(contact.x-dx/length*recoil,contact.y-dy/length*recoil);
+          SWDrawNavalUnit(o,{...position,combatTime:A,shotPhase17:pose?.phase,contact17:contact},k.current,j,unit.sunkAt!==undefined?(A-unit.sunkAt)*1000:sink?r-sink.born:2000,ve.current);o.restore();
+          SWDrawEscortCue(o,position,a?.objective,j,Pe,ve.current);
+          if(unit.hp>0)SWDrawNavalIntent17(o,position,a,battleInput14,A,Pe,selectedShip14===unit.shipId,ve.current);
         }
         if(navalSupport&&battleInput14?.campaignType!=='sea'&&!navalUnits.length&&!a?.units.some(unit=>unit.id===`naval-`+navalSupport.id)){
           SWDrawNavalUnit(o,{...navalSupport,x:-3,y:3,hp:1,maxHp:1,side:`attack`},k.current,j,2000,ve.current);
@@ -617,8 +646,8 @@ function Eu({
               r ? `#dceaff` : `#ffbaba`,
             );
           }
-        SWDrawRoads(o,b,_?g:[],appearance);
-        if (T && (swDeploymentState.current.reserveCount===undefined||swDeploymentState.current.reserveCount>0)){if(battleInput14?.campaignType==='sea')SWDrawLandingEdge14(o,battleInput14,Pe,swPreview.current);else SWDrawDeploymentEdge(o,Ue,Pe,swPreview.current);}
+        SWDrawRoads(o,b,_?g:[],appearance,e);
+        if (T && (swDeploymentState.current.reserveCount===undefined||swDeploymentState.current.reserveCount>0)){const preview=swPreview.current?.valid===false?null:swPreview.current;if(battleInput14?.campaignType==='sea')SWDrawLandingEdge14(o,battleInput14,Pe,preview);else SWDrawDeploymentEdge(o,Ue,Pe,preview);}
         if(swOrderAck.current){const age=r-swOrderAck.current.born;if(age<420){const point=vu(swOrderAck.current.x,swOrderAck.current.y),progress=age/420;o.save();o.globalAlpha=(1-progress)*.8;o.strokeStyle=`#d9e5cf`;o.lineWidth=1.4/Pe;o.beginPath();o.ellipse(point.x,point.y,(9+progress*10)/Pe,(4+progress*5)/Pe,0,0,Math.PI*2);o.stroke();o.restore();}else swOrderAck.current=null;}
         if(a&&!ve.current)for(const breach of ye.current.filter(event=>event.kind===`fall`&&(event.targetKind===`wall`||event.targetKind===`gate`))){
           const point=vu(breach.x,breach.y),age=(r-breach.born)/1800;o.save();o.strokeStyle=`rgba(231,194,122,${(1-age)*.65})`;o.lineWidth=2/Pe;o.beginPath();o.ellipse(point.x,point.y+2,17+age*12,7+age*5,0,0,Math.PI*2);o.stroke();o.restore();
@@ -700,11 +729,11 @@ function Eu({
           ((we.current = vu(i.x, i.y)),
             se.push({
               depth: i.x + i.y + 0.2,
-              draw: () => E(i,n,j,!1,!1,void 0,te),
+              draw: () => E(i,n,j,!1,!1,void 0,te,true),
             }));
         }
         if (!a && !_)
-          for (let e of Ee.filter(person=>!person.soldier&&person.id<15&&(person.sprite!==5||person.id<4))) {
+          for (let e of Ee.filter(person=>!person.soldier&&person.id<SWPresentationBudget15.citizens&&(person.sprite!==5||person.id<4))) {
             let t = e.soldier?Tu(e,j):SWCitizenPosition(e,j);
             if (!t) continue;
             let n = vu(t.x, t.y);
@@ -747,14 +776,15 @@ function Eu({
               i = Math.hypot(n.x - t.x, n.y - t.y) > 0.008 || (!O&&(motionChanged||performance.now()<(previous?.movingUntil||0))),
               o = [...a.shots,...(O?.shots||[])].find(
                 (e) =>
-                  (e.firedAt===undefined||A>=e.firedAt-.12)&&(e.impactAt===undefined||A<e.impactAt+.24)&&
+                  (a.events!==undefined?!!SWShotPose17(e,A,t.kind):(e.firedAt===undefined||A>=e.firedAt-.12)&&(e.impactAt===undefined||A<e.impactAt+.24))&&
                   (e.sourceId?e.sourceId===t.id:(e.kind === t.kind || t.kind === `hero` || t.kind===`healer`&&e.kind===`heal`)) &&
                   Math.hypot(e.x - t.x, e.y - t.y) < 0.8,
               ),
               s = o ? o.tx - o.ty < t.x - t.y : O&&i ? n.x - n.y < t.x - t.y : motionChanged ? t.x-t.y<previous.frameX-previous.frameY : previous?.flip || false,
               attackElapsed = (t.cooldown || 1.2) - (t.nextAttack - A),
-              attackPhase = o?.impactAt!==undefined?Math.max(0,Math.min(1,(A-o.impactAt+.18)/.36)):Math.max(0,Math.min(1,attackElapsed/.48)),
-              attacking = !!o || attackElapsed>=0&&attackElapsed<.48,
+              shotPose=SWShotPose17(o,A,t.kind),
+              attackPhase = shotPose?.phase??Math.max(0,Math.min(1,attackElapsed/.48)),
+              attacking = a.events!==undefined?!!shotPose:!!o || attackElapsed>=0&&attackElapsed<.48,
               c =
                 t.kind === `archer`
                   ? 6
@@ -764,7 +794,8 @@ function Eu({
                       ? 4
                       : 5;
             r.heading=o?Math.atan2(o.ty-t.y,o.tx-t.x):i?Math.atan2(n.y-t.y,n.x-t.x):previous?.heading??-.8;
-            const hit=(a.events||[]).find(event=>event.type===`impact`&&event.targetId===t.id&&A>=event.time&&A-event.time<.20);if(hit){const strength=Math.sin((A-hit.time)/.20*Math.PI);r.swHit={x:(t.x>=hit.x?1:-1)*strength*1.6,y:strength*.6,angle:strength*.018};}
+            const hit=[...(a.events||[]),...(O?.events||[])].find(event=>event.type===`impact`&&event.targetId===t.id&&A>=event.time&&A-event.time<.22);r.swHit=SWContactMotion17(hit,A,ve.current);
+            if(shotPose&&!ve.current){const direction=vu(t.x+Math.cos(r.heading),t.y+Math.sin(r.heading)),point=vu(t.x,t.y),length=Math.hypot(direction.x-point.x,direction.y-point.y)||1;r.swRecoil={x:-(direction.x-point.x)/length*shotPose.recoil,y:-(direction.y-point.y)/length*shotPose.recoil};}
             swRenderPositions.current.set(t.id,{...r,flip:s,frameX:t.x,frameY:t.y,movingUntil:motionChanged?performance.now()+550:previous?.movingUntil||0});
             se.push({
               depth: r.x + r.y + 0.1,
@@ -825,7 +856,7 @@ function Eu({
             for(const event of [...(a.events||[]),...(O?.events||[])])if(event.time<=A&&!swPresentationEvents.current.has(event.id))swPresentationEvents.current.set(event.id,{...event,targetNaval:a.units.some(unit=>unit.id===event.targetId&&unit.naval),born:r-Math.max(0,A-event.time)*1000});
             if(swPresentationEvents.current.size>192)for(const [id,event] of swPresentationEvents.current)if(r-event.born>2400)swPresentationEvents.current.delete(id);
             const shown=new Set();for(const shot of [...(a.shots||[]),...(O?.shots||[])]){const id=shot.sourceId+':'+shot.targetId+':'+shot.impactAt;if(shown.has(id))continue;shown.add(id);const start=shot.firedAt??(shot.impactAt??A)-.35,end=shot.impactAt??a.time;if(A>=start&&A<end)SWDrawProjectile(o,{...shot,presentationOnly:true},Math.max(0,Math.min(.779,(A-start)/Math.max(.01,end-start)*.78)),ve.current);}
-            for(const event of swPresentationEvents.current.values())SWDrawCombatEvent(o,event,r-event.born,ve.current);
+            for(const event of SWSelectCombatEffects15(swPresentationEvents.current.values(),r))SWDrawCombatEvent(o,event,r-event.born,ve.current);
           }else{const progress=Math.max(0,Math.min(1,(A-a.time)/Math.max(.25,(O?.time||a.time+.5)-a.time)));for(const shot of a.shots)SWDrawProjectile(o,shot,progress,ve.current);}
         }
         if (
@@ -938,6 +969,8 @@ function Eu({
               o.fillText(e[0].toUpperCase(), r.x, r.y + 5));
           }
         if(ornamentGhost){const valid=SWCanPlace({buildings:e,terrain:b,provinces:t,premium:{ornaments:appearance.ornaments||[]}},`monument`,ornamentGhost.x,ornamentGhost.y);C(ornamentGhost.x,ornamentGhost.y,valid?`#377df240`:`#b94a4960`,valid?`#b7d8ff`:`#eca39b`);SWDrawOrnament(o,ornamentGhost,appearance,j,true);}
+        if((T||navalTool14)&&swPreview.current)SWDrawDeploymentCue17(o,swPreview.current,Pe,ve.current?0:r,ve.current);
+        if(swDeploymentFeedback17.current){const feedback=swDeploymentFeedback17.current;if(r-feedback.born<1000)SWDrawDeploymentCue17(o,feedback,Pe,r,ve.current);else swDeploymentFeedback17.current=null;}
         o.restore();
       };
     return ((d = requestAnimationFrame(D)), () => cancelAnimationFrame(d));
@@ -972,14 +1005,13 @@ function Eu({
     He,
     navalSupport?.id,
     navalSupport?.kind,
-    defending,layoutOverlay14,battleInput14?.campaignType,
+    staticPreview,defending,layoutOverlay14,battleInput14?.campaignType,selectedShip14,navalTool14,
   ]);
   let Ge = (t, n) => {
     let r = We(t, n),
       i = yu(r.x, r.y);
     if (T) {
-      const target=SWDeploymentTarget(Ue,r,Pe);
-      target&&swDeploy.current?.(target.x,target.y);
+      swDeploymentFeedback17.current={x:i.x,y:i.y,valid:false,label:battleInput14?.campaignType==='sea'?'Land along the beach':'Deploy outside the walls',born:performance.now()};
       return;
     }
     if (S) {
@@ -993,9 +1025,9 @@ function Eu({
     if (
       !l &&
       we.current &&
-      Math.abs(r.x - we.current.x) < 25 &&
+      Math.abs(r.x - we.current.x) < 17 &&
       r.y < we.current.y + 10 &&
-      r.y > we.current.y - 70
+      r.y > we.current.y - 45
     ) {
       o?.();
       return;
@@ -1049,26 +1081,19 @@ function Eu({
     }
     (fe(null), s && d?.(s));
   };
-  const swFireDeployment=(target,silent=true)=>{
-    const state=swDeploymentState.current,gesture=swGesture.current;
-    if(!state.active||!target||gesture.multi||gesture.mode===`cancelled`||state.reserveCount===0){swCancelHold();return false;}
-    const accepted=swDeploy.current?.(target.x,target.y,{silent});
-    if(accepted===false){swCancelHold();return false;}
-    swOrderAck.current={...target,born:performance.now()};
-    if(!gesture.deployedTiles)gesture.deployedTiles=new Set();gesture.deployedTiles.add(`${target.x},${target.y}`);
-    gesture.held=true;gesture.lastTime=performance.now();gesture.lastTile=`${target.x},${target.y}`;
-    return true;
-  };
   SWInstallPointers14();
   const bridge14=C.useRef(null);bridge14.current={
-    active:()=>swDeploymentState.current.active,
-    target:(x,y)=>{const rect=O.current?.getBoundingClientRect();if(!rect||x<rect.left||x>rect.right||y<rect.top||y>rect.bottom||document.elementFromPoint(x,y)!==O.current)return null;return SWDeploymentTarget14(battleInput14,Ue,We(x,y),Pe)},
-    fire:(target,kind)=>{const accepted=swDeploy.current?.(target.x,target.y,{silent:true,kind});if(accepted)swOrderAck.current={...target,born:performance.now()};return accepted},
-    preview:target=>{swPreview.current=target;},
+    token:swGesture,
+    active:()=>swDeploymentState.current.active&&!document.hidden,
+    contains:(x,y)=>{const element=document.elementFromPoint(x,y);return element===O.current||!!element?.closest?.('.sw-deploy-strip14')},
+    target:(x,y,kind)=>{const rect=O.current?.getBoundingClientRect();if(!rect||x<rect.left||x>rect.right||y<rect.top||y>rect.bottom||document.elementFromPoint(x,y)!==O.current)return null;const target=SWDeploymentTarget14(battleInput14,Ue,We(x,y),Pe);if(!target)return null;const troop=kind||swDeploymentState.current.selectedTroop,carrier=SWLandingCarrier17(battleInput14,be.current.frame,troop,target,selectedShip14);return {...target,kind:troop,carrier,shipId:carrier?.shipId,valid:battleInput14?.campaignType!=='sea'||!!carrier,label:carrier?'Land '+(J[troop]?.name||'commander'):battleInput14?.campaignType==='sea'?'No transport has this troop':J[troop]?.name||'Deploy'}},
+    fire:(target,kind)=>{if(target.valid===false)return false;const accepted=swDeploy.current?.(target.x,target.y,{silent:true,kind,shipId:target.shipId});if(accepted)swOrderAck.current={...target,born:performance.now()};return accepted},
+    preview:(target,point)=>{swPreview.current=target; if(!target&&point&&document.elementFromPoint(point.x,point.y)===O.current){const tile=yu(We(point.x,point.y).x,We(point.x,point.y).y);swPreview.current={...tile,valid:false,label:battleInput14?.campaignType==='sea'?'Land along the beach':'Outside the walls'};}},
+    rejected:(target,kind)=>{swDeploymentFeedback17.current={...target,valid:false,label:target.valid===false?target.label:'No '+(J[kind]?.name||'troops')+' available',born:performance.now()};},
     pinch:points=>{if(points.length<2)return;swCancelHold();swGesture.current.multi=true;swGesture.current.mode='cancelled';me.current=null;swPreview.current=null;const [a,b]=points,cx=(a.x+b.x)/2,cy=(a.y+b.y)/2,rect=O.current.getBoundingClientRect();if(!_e.current)_e.current={distance:Math.max(1,Math.hypot(a.x-b.x,a.y-b.y)),zoom:A,world:We(cx,cy)};const base=_e.current,zoom=Math.max(swMinZoom,Math.min(3.2,base.zoom*Math.hypot(a.x-b.x,a.y-b.y)/base.distance)),scale=Ne*zoom;j(zoom);se({x:cx-rect.left-M.w/2-(base.world.x-cameraX)*scale,y:cy-rect.top-M.h/2+Fe-(base.world.y-cameraY)*scale});},
     endPinch:points=>{if(swGesture.current.multi){ge.current=new Map(points);if(!points.length){_e.current=null;me.current=null;swGesture.current.multi=false;swGesture.current.mode='idle';}}}
   };
-  C.useEffect(()=>{if(T){SWGestureBridge14.surface=bridge14.current;return()=>{if(SWGestureBridge14.surface===bridge14.current)SWGestureBridge14.surface=null}}},[T]);
+  C.useEffect(()=>{if(T){SWGestureBridge14.surface=bridge14.current;return()=>{if(SWGestureBridge14.surface?.token===swGesture){SWGestureBridge14.controller?.cancel();SWGestureBridge14.surface=null;}}}},[T]);
   if(T)SWGestureBridge14.surface=bridge14.current;
   return (0, F.jsxs)(`div`, {
     ref: re,
@@ -1097,11 +1122,12 @@ function Eu({
           ? `Enemy stronghold and fighting troops`
           : `Your village with working citizens and patrolling soldiers. Drag to explore; select a building to manage it.`,
         role: `img`,
+        style: staticPreview ? {pointerEvents:'none'} : undefined,
         onPointerDown: (event) => {
+          if(staticPreview)return;
           if(event.pointerType===`mouse`&&event.button!==0)return;
-          event.preventDefault();event.currentTarget.setPointerCapture(event.pointerId);
+          event.preventDefault();try{event.currentTarget.setPointerCapture(event.pointerId)}catch{/* Global listeners retain cancellation. */}
           ge.current.set(event.pointerId,{x:event.clientX,y:event.clientY});
-          if(SWGestureBridge14.points.size>=2)for(const[id,point]of SWGestureBridge14.points)ge.current.set(id,point);
           if(ge.current.size>=2){
             swCancelHold();swPreview.current=null;swGesture.current.multi=true;me.current=null;Ce.current=null;
             if(l===`wall`)a?.(swGesture.current.wall);
@@ -1109,22 +1135,13 @@ function Eu({
             _e.current={distance:Math.max(1,Math.hypot(points[0].x-points[1].x,points[0].y-points[1].y)),zoom:A,world:We(cx,cy)};return;
           }
           if(swAllPointers.current.size>1){swCancelHold();swGesture.current.multi=true;swGesture.current.mode=`cancelled`;me.current=null;Ce.current=null;swPreview.current=null;return;}
-          if(navalTool14){const world=We(event.clientX,event.clientY),tile=yu(world.x,world.y);if(navalTool14.type==='focus'){const target=p?.units.filter(u=>u.side==='defend'&&u.hp>0&&Math.hypot(u.x-tile.x,u.y-tile.y)<1.5).sort((a,b)=>Math.hypot(a.x-tile.x,a.y-tile.y)-Math.hypot(b.x-tile.x,b.y-tile.y))[0];if(target)onNavalMap14?.(tile.x,tile.y,target.id)}else if(tile.x<=-2.4&&!(tile.x>-6.7&&tile.x<-5.7&&tile.y>3.05&&tile.y<5.85))onNavalMap14?.(Math.max(-12,Math.min(-2.4,tile.x)),Math.max(-2,Math.min(11,tile.y)));swGesture.current.mode='cancelled';return;}
+          if(navalTool14){const world=We(event.clientX,event.clientY),tile=yu(world.x,world.y);swPreview.current=SWNavalCommandTarget17(be.current.frame,tile,navalTool14.type)||{...tile,valid:false,label:navalTool14.type==='move'?'Choose open water':'Choose an enemy ship or defense'};swGesture.current.mode='naval-command';swGesture.current.multi=false;me.current={x:event.clientX,y:event.clientY,ox:Re,oy:ze,moved:false};return;}
           if(T&&SWBeginPointer14(event,selectedTroop,'map')){swGesture.current.mode='shared-deploy';me.current=null;return;}
-          const world=We(event.clientX,event.clientY),tile=yu(world.x,world.y),target=null;
-          const canDeploy=target&&(reserveCount===undefined||reserveCount>0);
-          Object.assign(swGesture.current,{multi:false,held:false,wall:[...i],mode:canDeploy?`pending-deploy`:l===`wall`?`wall`:`pan`,target,path:target?[target]:[],started:performance.now(),lastTime:0,lastTile:null,deployedTiles:new Set()});
-          swPreview.current=canDeploy?target:null;
+          const world=We(event.clientX,event.clientY),tile=yu(world.x,world.y);
+          Object.assign(swGesture.current,{multi:false,held:false,wall:[...i],mode:l===`wall`?`wall`:`pan`});
+          swPreview.current=null;
           me.current={x:event.clientX,y:event.clientY,ox:Re,oy:ze,moved:false};
           if(l===`wall`)Ce.current=i[0]||{x:Math.round(tile.x),y:Math.round(tile.y)};
-          if(canDeploy){
-            swGesture.current.hold=setTimeout(()=>{
-              if(swGesture.current.multi||ge.current.size!==1||!swGesture.current.mode.endsWith(`deploy`))return;
-              if(!swFireDeployment(swGesture.current.target))return;
-              swGesture.current.mode=`hold-deploy`;
-              swGesture.current.repeat=setInterval(()=>swFireDeployment(swGesture.current.target),140);
-            },260);
-          }
         },
         onPointerMove: (event) => {
           if(ge.current.size&&!ge.current.has(event.pointerId))return;
@@ -1141,16 +1158,7 @@ function Eu({
           if(me.current){
             const dx=event.clientX-me.current.x,dy=event.clientY-me.current.y,gesture=swGesture.current;
             if(Math.abs(dx)+Math.abs(dy)>8)me.current.moved=true;
-            if(gesture.mode.endsWith(`deploy`)){
-              const target=SWDeploymentTarget(Ue,We(event.clientX,event.clientY),Pe);gesture.target=target;swPreview.current=target;
-              if(target&&(gesture.path.at(-1)?.x!==target.x||gesture.path.at(-1)?.y!==target.y))gesture.path.push(target);
-              if(me.current.moved){
-                if(!target&&!gesture.held&&gesture.path.length===1){swCancelHold();gesture.mode=`pan`;se({x:Math.max(swMinPanX,Math.min(swMaxPanX,me.current.ox+dx)),y:Math.max(swMinPanY,Math.min(swMaxPanY,me.current.oy+dy))});return;}
-                gesture.mode=`paint-deploy`;
-                if(target&&performance.now()-gesture.started>=260&&performance.now()-gesture.lastTime>100)swFireDeployment(target);
-              }
-              return;
-            }
+            if(gesture.mode==='naval-command'&&me.current.moved)swPreview.current=null;
             if(l===`wall`&&Ce.current&&me.current.moved){const world=We(event.clientX,event.clientY),tile=yu(world.x,world.y);a?.(Xc(Ce.current,{x:Math.round(tile.x),y:Math.round(tile.y)}));return;}
             if(S&&w&&me.current.moved){const world=We(event.clientX,event.clientY),tile=yu(world.x,world.y),key=Math.round(tile.x)+','+Math.round(tile.y);if(swGesture.current.paint14!==key){swGesture.current.paint14=key;w(Math.round(tile.x),Math.round(tile.y))}return;}
             if(me.current.moved)se({x:Math.max(swMinPanX,Math.min(swMaxPanX,me.current.ox+dx)),y:Math.max(swMinPanY,Math.min(swMaxPanY,me.current.oy+dy))});
@@ -1160,11 +1168,9 @@ function Eu({
           swCancelHold();ge.current.delete(event.pointerId);
           const gesture=swGesture.current;
           if(!gesture.multi&&me.current){
-            if(gesture.mode.endsWith(`deploy`)){
-              if(me.current.moved){
-                // Placements commit under the finger; release adds no trail.
-              }else if(!gesture.held)swFireDeployment(gesture.target,false);
-            }else if(gesture.mode!==`cancelled`&&!me.current.moved){
+            if(gesture.mode==='naval-command'){
+              if(!me.current.moved&&navalTool14){const world=We(event.clientX,event.clientY),tile=yu(world.x,world.y),target=SWNavalCommandTarget17(be.current.frame,tile,navalTool14.type);if(target)onNavalMap14?.(target.x,target.y,target.targetId);else swDeploymentFeedback17.current={...tile,valid:false,label:navalTool14.type==='move'?'Choose open water':'Choose an enemy ship or defense',born:performance.now()};}
+            }else if(gesture.mode!==`cancelled`&&gesture.mode!==`shared-deploy`&&!me.current.moved){
               if(l===`wall`){const world=We(event.clientX,event.clientY),tile=yu(world.x,world.y);a?.(Xc(Ce.current||tile,{x:Math.round(tile.x),y:Math.round(tile.y)}));}
               else Ge(event.clientX,event.clientY);
             }
@@ -1203,7 +1209,7 @@ function Eu({
             }),
           ],
         }),
-      (0, F.jsxs)(`div`, {
+      !staticPreview && (0, F.jsxs)(`div`, {
         className: `map-controls`,
         children: [
           (0, F.jsx)(`button`, {
@@ -1226,3 +1232,5 @@ function Eu({
     ],
   });
 }
+
+export { Eu };

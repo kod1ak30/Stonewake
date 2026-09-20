@@ -727,8 +727,9 @@ test("verified cosmetics: typed catalog, restore dedup, account binding and equi
       assert.equal(out.status, 200, JSON.stringify(out));
       return out;
     }
+    const ivoryPrice = R.SWPremiumCatalog.find((item) => item.id === "palette:ivory").priceGems;
     await action(
-      { type: "buyCosmetic", id: "palette:ivory", maxPrice: 120 },
+      { type: "buyCosmetic", id: "palette:ivory", maxPrice: ivoryPrice },
       "cosmetic-buy-independent",
     );
     const tx = {
@@ -769,7 +770,7 @@ test("verified cosmetics: typed catalog, restore dedup, account binding and equi
       a.token,
     );
     assert.equal(paid.status, "granted");
-    assert.equal(paid.game.state.gems, 880);
+    assert.equal(paid.game.state.gems, 1000 - ivoryPrice);
     assert(paid.game.state.premium.owned.includes("road:stone"));
     assert(!paid.game.state.premium.owned.includes("road:royal"));
     const ownership = paid.game.state.premium.owned.slice().sort();
@@ -791,7 +792,7 @@ test("verified cosmetics: typed catalog, restore dedup, account binding and equi
       a.token,
     );
     assert(restored.duplicate);
-    assert.equal(restored.game.state.gems, 880);
+    assert.equal(restored.game.state.gems, 1000 - ivoryPrice);
     assert.deepEqual(
       restored.game.state.premium.owned.slice().sort(),
       ownership,
@@ -834,7 +835,7 @@ test("verified cosmetics: typed catalog, restore dedup, account binding and equi
       game.state.premium.owned.includes("palette:ivory"),
       "Refund removed independently gem-bought item",
     );
-    assert.equal(game.state.gems, 880);
+    assert.equal(game.state.gems, 1000 - ivoryPrice);
     assert.equal(game.state.gemDebt || 0, 0);
     const revision = game.revision;
     await req("/v1/store/notifications", { signedPayload: "test-notice" });

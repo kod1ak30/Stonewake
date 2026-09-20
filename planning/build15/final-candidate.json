@@ -1,0 +1,55 @@
+{
+  "build": 15,
+  "rulesHash": "c1d73c9fee3f1a0a24cf5fe367b672b66a568cc073f78dab864207319077d53b",
+  "outputs": {
+    "app": {
+      "path": "Stonewake/Web/assets/index-BPhrguZ3.js",
+      "bytes": 1455403,
+      "sha256": "e7b00b5f2f19e3b202748d5dfd657c7d5412d597c27ed4cc6c117ca888c1266b"
+    },
+    "worker": {
+      "path": "Stonewake/Web/assets/battle-worker.js",
+      "bytes": 227871,
+      "sha256": "7e91c13867ccd9067a2e00b07539d6ffdb2ec0258b74238fbc0081822c69fe53"
+    },
+    "rules": {
+      "path": "backend/src/rules.mjs",
+      "bytes": 222118,
+      "sha256": "74a43ec93c8d06bcacc981f7e0d2ada8a12487026b0231087ddc8bd19886e6dc"
+    },
+    "interface15": {
+      "path": "Stonewake/Web/interface15.css",
+      "bytes": 28835,
+      "sha256": "4b3aac8f3df4f3359d82e18908dc6518194f1e6de138d418b65be94d649ca92b"
+    },
+    "shipArt": {
+      "path": "Stonewake/Web/art/build15/coastal-ships.png",
+      "bytes": 2473855,
+      "sha256": "34e06f5c119c0e1701fe7ffb0fea7233e6c1e74a3ebc9e912178d785352eb97d"
+    },
+    "welcomeArt": {
+      "path": "Stonewake/Web/art/build15/harbor-dawn.png",
+      "bytes": 3247946,
+      "sha256": "1d2456eef8c2af493f5dedf5530eed5481d1fd4f6bc4ccffb76d396d7eaf21a6"
+    }
+  },
+  "native": {
+    "build": 15,
+    "bundle": "com.chrismozer.stonewake",
+    "orientations": [
+      "landscapeLeft",
+      "landscapeRight"
+    ],
+    "signedDevelopmentBuild": "passed",
+    "simulatorBuild": "passed",
+    "physicalInstall": "verified",
+    "savePreservedBeforeLaunch": true,
+    "physicalLaunch": "verified after unlock: native process launch, game_ready and engine_worker",
+    "protectedProgressAfterLaunch": "verified buildings, army, terrain, campaigns, research, unitLevels, gems, grants, cosmetics, commanders, provinces and loadouts",
+    "resumeChanges": [
+      "pending level-1 ship construction completed",
+      "overdue automatic raid settled with 1636 of each resource looted",
+      "normal income and time/revision updates"
+    ]
+  }
+}

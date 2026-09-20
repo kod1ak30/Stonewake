@@ -21,6 +21,8 @@ struct StonewakeApp: App {
     var body: some Scene {
         WindowGroup {
             GameView()
+                .ignoresSafeArea(.all)
+                .statusBarHidden(true)
                 .background(Color(red: 23/255, green: 34/255, blue: 55/255))
                 .preferredColorScheme(.dark)
                 .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
@@ -32,43 +34,107 @@ struct StonewakeApp: App {
 
 struct GameView: UIViewRepresentable {
     func makeCoordinator() -> Coordinator { Coordinator() }
-    func makeUIView(context: Context) -> WKWebView {
+    func makeUIView(context: Context) -> StonewakeSurface15 {
         let configuration = WKWebViewConfiguration()
         configuration.websiteDataStore = .default()
         configuration.setURLSchemeHandler(context.coordinator, forURLScheme: "stonewake")
         configuration.userContentController.add(context.coordinator, name: "stonewake")
         configuration.allowsInlineMediaPlayback = true
         configuration.mediaTypesRequiringUserActionForPlayback = [.video]
-        let saved = SaveStore.load().flatMap { String(data: $0, encoding: .utf8) } ?? "null"
-        let seen = UserDefaults.standard.bool(forKey: "openingSeen") ? "true" : "false"
-        // JSON is parsed as data, never inserted as executable source.
-        let encoded = Data(saved.utf8).base64EncodedString()
-        let boot = "window.__STONEWAKE_SAVE__=JSON.parse(new TextDecoder().decode(Uint8Array.from(atob('\(encoded)'),c=>c.charCodeAt(0))));window.__STONEWAKE_INTRO_SEEN__=\(seen);"
-        configuration.userContentController.addUserScript(WKUserScript(source: boot, injectionTime: .atDocumentStart, forMainFrameOnly: true))
         let webView = WKWebView(frame: .zero, configuration: configuration)
         webView.isOpaque = false
-        webView.backgroundColor = UIColor(red: 23/255, green: 34/255, blue: 55/255, alpha: 1)
+        webView.backgroundColor = StonewakeSurface15.ink
+        webView.scrollView.backgroundColor = StonewakeSurface15.ink
         webView.scrollView.isScrollEnabled = false
         webView.scrollView.bounces = false
-        // The game camera owns zoom. Disable page-level pinch resizing in WebKit.
+        webView.scrollView.contentInsetAdjustmentBehavior = .never
         webView.scrollView.bouncesZoom = false
         webView.scrollView.minimumZoomScale = 1
         webView.scrollView.maximumZoomScale = 1
         webView.scrollView.pinchGestureRecognizer?.isEnabled = false
         webView.navigationDelegate = context.coordinator
+        let surface = StonewakeSurface15(webView: webView)
+        context.coordinator.surface = surface
         context.coordinator.webView = webView
         context.coordinator.online.webView = webView
-        webView.load(URLRequest(url: URL(string: "stonewake://app/index.html")!))
-        return webView
+        context.coordinator.native.webView = webView
+        surface.onRetry = { [weak coordinator = context.coordinator] in coordinator?.loadGame(reason: "manual_reload") }
+        context.coordinator.loadGame(reason: "session_start")
+        return surface
     }
-    func updateUIView(_ uiView: WKWebView, context: Context) {}
-    static func dismantleUIView(_ uiView: WKWebView, coordinator: Coordinator) {
-        uiView.configuration.userContentController.removeScriptMessageHandler(forName: "stonewake")
-        uiView.navigationDelegate = nil
-        coordinator.narration.stop()
+    func updateUIView(_ uiView: StonewakeSurface15, context: Context) {}
+    static func dismantleUIView(_ uiView: StonewakeSurface15, coordinator: Coordinator) {
+        uiView.webView.configuration.userContentController.removeScriptMessageHandler(forName: "stonewake")
+        uiView.webView.navigationDelegate = nil
+        coordinator.teardown()
     }
     final class Coordinator: NSObject, WKNavigationDelegate, WKURLSchemeHandler, WKScriptMessageHandler {
         weak var webView: WKWebView?
+        weak var surface: StonewakeSurface15?
+        let native = StonewakeNative15()
+        let assets = StonewakeAssets15()
+        private var recoveryDates: [Date] = []
+        private var observers: [NSObjectProtocol] = []
+        private var loadingTimeout: DispatchWorkItem?
+        private var ready = false
+        override init() {
+            super.init()
+            for (name, state) in [(UIApplication.willResignActiveNotification, "inactive"), (UIApplication.didEnterBackgroundNotification, "background"), (UIApplication.didBecomeActiveNotification, "active")] {
+                observers.append(NotificationCenter.default.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in
+                    Task { @MainActor [weak self] in
+                        guard let self else { return }
+                        self.native.lifecycle(state)
+                        if state == "active" { self.surface?.publishInsets(force: true) }
+                    }
+                })
+            }
+            observers.append(NotificationCenter.default.addObserver(forName: UIApplication.didReceiveMemoryWarningNotification, object: nil, queue: .main) { [weak self] _ in
+                Task { @MainActor [weak self] in self?.native.diagnostics.record("memory_warning") }
+            })
+        }
+        func teardown() {
+            observers.forEach(NotificationCenter.default.removeObserver)
+            observers.removeAll()
+            loadingTimeout?.cancel()
+            narration.stop()
+            audio.suspend()
+            assets.cancelAll()
+            native.lifecycle("closed")
+        }
+        func loadGame(reason: String) {
+            guard let webView else { return }
+            ready = false
+            narration.stop()
+            audio.suspend()
+            assets.cancelAll()
+            surface?.showLoading()
+            native.diagnostics.record(reason)
+            // Replace boot scripts on every recovery. Never accumulate old save snapshots.
+            let data = SaveStore.load() ?? Data("null".utf8)
+            let encoded = data.base64EncodedString()
+            let seen = UserDefaults.standard.bool(forKey: "openingSeen") ? "true" : "false"
+            let boot = "window.__STONEWAKE_SAVE__=JSON.parse(new TextDecoder().decode(Uint8Array.from(atob('\(encoded)'),c=>c.charCodeAt(0))));window.__STONEWAKE_INTRO_SEEN__=\(seen);window.__STONEWAKE_NATIVE__={version:15,landscape:true};"
+            webView.configuration.userContentController.removeAllUserScripts()
+            webView.configuration.userContentController.addUserScript(WKUserScript(source: boot, injectionTime: .atDocumentStart, forMainFrameOnly: true))
+            webView.load(URLRequest(url: URL(string: "stonewake://app/index.html")!, cachePolicy: .reloadIgnoringLocalCacheData))
+            loadingTimeout?.cancel()
+            let timeout = DispatchWorkItem { [weak self] in
+                guard let self, !self.ready else { return }
+                self.surface?.showFailure("Your kingdom is taking longer to open. Try again without changing your saved progress.")
+                self.native.diagnostics.record("load_timeout")
+            }
+            loadingTimeout = timeout
+            DispatchQueue.main.asyncAfter(deadline: .now() + 25, execute: timeout)
+        }
+        private func gameReady() {
+            guard !ready else { return }
+            ready = true
+            audio.resumeIfActive(UIApplication.shared.applicationState == .active)
+            loadingTimeout?.cancel()
+            surface?.finishLoading()
+            surface?.publishInsets(force: true)
+            native.diagnostics.record("game_ready")
+        }
         let audio = GameAudio()
         let feedback = GameFeedback()
         let online = StonewakeOnline()
@@ -84,11 +150,17 @@ struct GameView: UIViewRepresentable {
         func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
             guard message.frameInfo.isMainFrame, message.frameInfo.request.url?.scheme == "stonewake", message.frameInfo.request.url?.host == "app",
                   let body = message.body as? [String: Any], let kind = body["kind"] as? String else { return }
+            if kind == "native", let method = body["method"] as? String {
+                let payload = body["payload"] as? [String: Any] ?? [:]
+                if method == "ready" { gameReady() }
+                native.handle(id: body["id"] as? String, method: method, payload: payload)
+                return
+            }
             if kind == "online", let id = body["id"] as? String, let method = body["method"] as? String {
                 online.handle(id: id, method: method, payload: body["payload"] as? [String: Any] ?? [:]); return
             }
-            if kind == "runtimeStatus", let engine = body["engine"] as? String, ["worker", "fallback"].contains(engine) {
-                NSLog("Stonewake simulation engine: %@", engine)
+            if kind == "runtimeStatus", let engine = body["engine"] as? String, ["worker", "failed"].contains(engine) {
+                native.diagnostics.record(engine == "worker" ? "engine_worker" : "engine_failed")
                 return
             }
             if kind == "narration" {
@@ -127,35 +199,23 @@ struct GameView: UIViewRepresentable {
             }
             if kind == "introSeen" { UserDefaults.standard.set(true, forKey: "openingSeen"); return }
             guard kind == "save", let payload = body["payload"] as? String, let data = payload.data(using: .utf8) else { return }
-            let saved: Bool
-            do { try SaveStore.write(data); saved = true } catch { saved = false }
-            webView?.evaluateJavaScript("window.dispatchEvent(new CustomEvent('stonewake-save-status',{detail:{saved:\(saved ? "true" : "false")}}));", completionHandler: nil)
+            // Acknowledge only after the serial durable writer finishes. Disk and JSON
+            // validation never occupy the web view's input thread.
+            let requestID = (body["requestId"] as? String).flatMap { $0.count <= 160 ? $0 : nil }
+            let backgroundTask = UIApplication.shared.beginBackgroundTask(withName: "Save kingdom")
+            SaveStore.writeAsync(data) { [weak self] saved in
+                DispatchQueue.main.async {
+                    if !saved { self?.native.diagnostics.record("save_failed") }
+                    let detail: [String: Any] = ["saved": saved, "requestId": requestID ?? ""]
+                    if let encoded = try? JSONSerialization.data(withJSONObject: detail), let json = String(data: encoded, encoding: .utf8) {
+                        self?.webView?.evaluateJavaScript("window.dispatchEvent(new CustomEvent('stonewake-save-status',{detail:\(json)}));", completionHandler: nil)
+                    }
+                    if backgroundTask != .invalid { UIApplication.shared.endBackgroundTask(backgroundTask) }
+                }
+            }
         }
-        func webView(_ webView: WKWebView, start urlSchemeTask: WKURLSchemeTask) {
-            guard let url = urlSchemeTask.request.url, url.host == "app",
-                  let root = Bundle.main.url(forResource: "Web", withExtension: nil) else {
-                urlSchemeTask.didFailWithError(URLError(.fileDoesNotExist)); return
-            }
-            let path = url.path == "/" ? "index.html" : String(url.path.dropFirst())
-            let file = root.appendingPathComponent(path).standardizedFileURL
-            guard file.path.hasPrefix(root.standardizedFileURL.path + "/"), let data = try? Data(contentsOf: file) else {
-                urlSchemeTask.didFailWithError(URLError(.fileDoesNotExist)); return
-            }
-            let mime: String
-            switch file.pathExtension.lowercased() {
-            case "js", "mjs": mime = "text/javascript"
-            case "css": mime = "text/css"
-            case "html": mime = "text/html"
-            case "json", "webmanifest": mime = "application/json"
-            case "webp": mime = "image/webp"
-            case "svg": mime = "image/svg+xml"
-            default: mime = UTType(filenameExtension: file.pathExtension)?.preferredMIMEType ?? "application/octet-stream"
-            }
-            urlSchemeTask.didReceive(URLResponse(url: url, mimeType: mime, expectedContentLength: data.count, textEncodingName: mime.hasPrefix("text/") ? "utf-8" : nil))
-            urlSchemeTask.didReceive(data)
-            urlSchemeTask.didFinish()
-        }
-        func webView(_ webView: WKWebView, stop urlSchemeTask: WKURLSchemeTask) {}
+        func webView(_ webView: WKWebView, start urlSchemeTask: WKURLSchemeTask) { assets.start(urlSchemeTask) }
+        func webView(_ webView: WKWebView, stop urlSchemeTask: WKURLSchemeTask) { assets.stop(urlSchemeTask) }
         func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
             guard let url = navigationAction.request.url else { decisionHandler(.cancel); return }
             if url.scheme == "stonewake" && url.host == "app" { decisionHandler(.allow) }
@@ -164,20 +224,39 @@ struct GameView: UIViewRepresentable {
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
             webView.scrollView.pinchGestureRecognizer?.isEnabled = false
             webView.scrollView.setZoomScale(1, animated: false)
+            surface?.publishInsets(force: true)
+            native.diagnostics.record("document_loaded")
+            // Legacy-compatible fallback only after React has actually rendered.
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self, weak webView] in
+                webView?.evaluateJavaScript("!!document.querySelector('#root')?.children.length") { value, _ in
+                    if value as? Bool == true { self?.gameReady() }
+                }
+            }
+        }
+        func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) { failed(error) }
+        func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) { failed(error) }
+        private func failed(_ error: Error) {
+            guard (error as NSError).code != NSURLErrorCancelled else { return }
+            loadingTimeout?.cancel()
+            native.diagnostics.record("navigation_failed", metrics: ["code": Double((error as NSError).code)])
+            surface?.showFailure("Your kingdom could not open. Your saved progress is still on this iPhone.")
         }
         func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
-            // Recreate the document with the most recent acknowledged native save.
-            let data = SaveStore.load() ?? Data("null".utf8)
-            let encoded = data.base64EncodedString()
-            let seen = UserDefaults.standard.bool(forKey: "openingSeen") ? "true" : "false"
-            let boot = "window.__STONEWAKE_SAVE__=JSON.parse(new TextDecoder().decode(Uint8Array.from(atob('\(encoded)'),c=>c.charCodeAt(0))));window.__STONEWAKE_INTRO_SEEN__=\(seen);"
-            webView.configuration.userContentController.addUserScript(WKUserScript(source: boot, injectionTime: .atDocumentStart, forMainFrameOnly: true))
-            webView.reload()
+            native.diagnostics.record("web_process_terminated")
+            let now = Date()
+            recoveryDates = recoveryDates.filter { now.timeIntervalSince($0) < 60 }
+            recoveryDates.append(now)
+            if recoveryDates.count <= 2 { loadGame(reason: "automatic_reload") }
+            else {
+                loadingTimeout?.cancel()
+                surface?.showFailure("The game stopped several times. Try opening your saved kingdom again.")
+            }
         }
     }
 }
 
 enum SaveStore {
+    private static let queue = DispatchQueue(label: "com.chrismozer.stonewake.saves", qos: .utility)
     static var directory: URL { FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0].appendingPathComponent("Stonewake", isDirectory: true) }
     static var primary: URL { directory.appendingPathComponent("kingdom.json") }
     static var backup: URL { directory.appendingPathComponent("kingdom.backup.json") }
@@ -188,10 +267,19 @@ enum SaveStore {
         return true
     }
     static func load() -> Data? {
-        for file in [primary, backup] { if let data = try? Data(contentsOf: file), valid(data) { return data } }
-        return nil
+        queue.sync {
+            for file in [primary, backup] { if let data = try? Data(contentsOf: file), valid(data) { return data } }
+            return nil
+        }
     }
-    static func write(_ data: Data) throws {
+    static func write(_ data: Data) throws { try queue.sync { try writeSerial(data) } }
+    static func writeAsync(_ data: Data, completion: @escaping @Sendable (Bool) -> Void) {
+        queue.async {
+            do { try writeSerial(data); completion(true) }
+            catch { completion(false) }
+        }
+    }
+    private static func writeSerial(_ data: Data) throws {
         guard valid(data) else { throw CocoaError(.fileWriteInapplicableStringEncoding) }
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         if let old = try? Data(contentsOf: primary), valid(old) { try old.write(to: backup, options: [.atomic, .completeFileProtectionUntilFirstUserAuthentication]) }
@@ -233,7 +321,11 @@ final class GameFeedback {
 }
 
 // Keep overlapping effects alive until playback finishes.
-final class GameAudio: NSObject, AVAudioPlayerDelegate {
+final class GameAudio: NSObject, AVAudioPlayerDelegate, @unchecked Sendable {
+    private let queue = DispatchQueue(label: "com.chrismozer.stonewake.audio", qos: .userInitiated)
+    private var appActive = false
+    private var sessionPrepared = false
+    private var effectPool: [String: [AVAudioPlayer]] = [:]
     private var players: [AVAudioPlayer] = []
     private var music: AVAudioPlayer?
     private var percussion: AVAudioPlayer?
@@ -243,6 +335,8 @@ final class GameAudio: NSObject, AVAudioPlayerDelegate {
     private var retiringMusic: [AVAudioPlayer] = []
     private var musicContext = "city"
     private var loadedTrack: String?
+    private var audioInterrupted = false
+    private var routeSuspended = false
     private var soundEnabled = true
     private var musicEnabled = true
     private var level: Float = 0.55
@@ -254,33 +348,73 @@ final class GameAudio: NSObject, AVAudioPlayerDelegate {
 
     override init() {
         super.init()
+        appActive = UIApplication.shared.applicationState == .active
+        queue.async { [weak self] in self?.prepareEffects() }
         NotificationCenter.default.addObserver(self, selector: #selector(pauseMusic), name: UIApplication.willResignActiveNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(resumeMusic), name: UIApplication.didBecomeActiveNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(interrupted(_:)), name: AVAudioSession.interruptionNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(routeChanged(_:)), name: AVAudioSession.routeChangeNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(resetAudio), name: AVAudioSession.mediaServicesWereResetNotification, object: nil)
     }
 
     deinit { NotificationCenter.default.removeObserver(self) }
 
-    func setMusic(enabled: Bool, volume: Double, battleVolume: Double = 0.14) {
+    func setMusic(enabled: Bool, volume: Double, battleVolume: Double = 0.14) { queue.async { self.setMusicQueued(enabled: enabled, volume: volume, battleVolume: battleVolume) } }
+    func setMusicContext(_ context: String, intensity: Double) { queue.async { self.setMusicContextQueued(context, intensity: intensity) } }
+    func setReducedEffects(_ reduced: Bool) { queue.async { self.setReducedEffectsQueued(reduced) } }
+    func setNarrationActive(_ active: Bool) { queue.async { self.setNarrationActiveQueued(active) } }
+    func update(enabled: Bool, volume: Double) { queue.async { self.updateQueued(enabled: enabled, volume: volume) } }
+    func play(_ effect: String, volume: Double) { queue.async { self.playQueued(effect, volume: volume) } }
+    func suspend() { queue.async { self.appActive = false; self.pauseMusicQueued() } }
+    func resumeIfActive(_ active: Bool) { queue.async { self.appActive = active; self.resumeMusicQueued() } }
+    @objc private func pauseMusic() { queue.async { self.appActive = false; self.pauseMusicQueued() } }
+    @objc private func resumeMusic() { queue.async { self.appActive = true; self.resumeMusicQueued() } }
+    @objc private func interrupted(_ note: Notification) { queue.async { self.interruptedQueued(note) } }
+    @objc private func routeChanged(_ note: Notification) { queue.async { self.routeChangedQueued(note) } }
+    @objc private func resetAudio() { queue.async { self.resetAudioQueued() } }
+    func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) { queue.async { self.audioPlayerDidFinishPlayingQueued(player, successfully: flag) } }
+
+    private func prepareSession() throws {
+        guard !sessionPrepared else { return }
+        let session = AVAudioSession.sharedInstance()
+        try session.setCategory(.playback, mode: .default, options: [.mixWithOthers])
+        try session.setActive(true)
+        sessionPrepared = true
+    }
+    private func prepareEffects() {
+        for name in effects {
+            guard let url = Bundle.main.url(forResource: name, withExtension: "wav", subdirectory: "Web/audio") else { continue }
+            let voices = ["click", "hit", "naval-impact", "wood-break"].contains(name) ? 3 : 2
+            effectPool[name] = (0..<voices).compactMap { _ in
+                guard let player = try? AVAudioPlayer(contentsOf: url) else { return nil }
+                player.enableRate = true; player.delegate = self; player.prepareToPlay()
+                return player
+            }
+        }
+    }
+
+
+    func setMusicQueued(enabled: Bool, volume: Double, battleVolume: Double = 0.14) {
         guard volume.isFinite else { return }
         musicLevel = Float(max(0, min(1, volume)))
         if battleVolume.isFinite { battleMusicLevel = Float(max(0, min(1, battleVolume))) }
         musicEnabled = enabled
-        resumeMusic()
+        routeSuspended = false
+        resumeMusicQueued()
     }
 
-    func setMusicContext(_ context: String, intensity: Double) {
+    func setMusicContextQueued(_ context: String, intensity: Double) {
         let context = context == "calm" ? "city" : context
         guard ["city", "scout", "battle", "victory"].contains(context), intensity.isFinite else { return }
         self.intensity = Float(max(0, min(1, intensity)))
         if context == musicContext { updatePercussion(); return }
         musicContext = context
-        resumeMusic()
+        resumeMusicQueued()
     }
 
-    func setReducedEffects(_ reduced: Bool) { reducedEffects = reduced; updatePercussion() }
+    func setReducedEffectsQueued(_ reduced: Bool) { reducedEffects = reduced; updatePercussion() }
 
-    func setNarrationActive(_ active: Bool) {
+    func setNarrationActiveQueued(_ active: Bool) {
         narrationActive = active
         updateMusicVolume(fade: active ? 0.2 : 0.65)
         updatePercussion()
@@ -294,27 +428,46 @@ final class GameAudio: NSObject, AVAudioPlayerDelegate {
         percussion?.setVolume(musicEnabled && musicContext == "battle" && !reducedEffects ? battleMusicLevel * intensity * 0.25 * effectDuck * (narrationActive ? 0.22 : 1) : 0, fadeDuration: 1.2)
     }
 
-    @objc private func pauseMusic() {
+    private func pauseMusicQueued() {
+        players.forEach { $0.stop() }
+        players.removeAll()
+        duckRecovery?.cancel()
+        effectDuck = 1
         music?.pause()
         percussion?.pause()
         retiringMusic.forEach { $0.stop() }
         retiringMusic.removeAll()
     }
 
-    @objc private func interrupted(_ notification: Notification) {
+    private func interruptedQueued(_ notification: Notification) {
         guard let raw = notification.userInfo?[AVAudioSessionInterruptionTypeKey] as? UInt,
               let type = AVAudioSession.InterruptionType(rawValue: raw) else { return }
-        if type == .began { pauseMusic() }
+        if type == .began { audioInterrupted = true; sessionPrepared = false; pauseMusicQueued() }
         else if let options = notification.userInfo?[AVAudioSessionInterruptionOptionKey] as? UInt,
-                AVAudioSession.InterruptionOptions(rawValue: options).contains(.shouldResume) { resumeMusic() }
+                AVAudioSession.InterruptionOptions(rawValue: options).contains(.shouldResume) { audioInterrupted = false; resumeMusicQueued() }
+        else { audioInterrupted = false }
     }
 
-    @objc private func resumeMusic() {
-        guard musicEnabled, UIApplication.shared.applicationState == .active else { pauseMusic(); return }
+    private func routeChangedQueued(_ notification: Notification) {
+        guard let raw = notification.userInfo?[AVAudioSessionRouteChangeReasonKey] as? UInt,
+              AVAudioSession.RouteChangeReason(rawValue: raw) == .oldDeviceUnavailable else { return }
+        // Do not unexpectedly play aloud after headphones disconnect.
+        routeSuspended = true
+        sessionPrepared = false
+        pauseMusicQueued()
+    }
+    private func resetAudioQueued() {
+        pauseMusicQueued()
+        music = nil; percussion = nil; loadedTrack = nil
+        effectPool.removeAll(); sessionPrepared = false
+        prepareEffects()
+        audioInterrupted = false
+        resumeMusicQueued()
+    }
+    private func resumeMusicQueued() {
+        guard musicEnabled, !audioInterrupted, !routeSuspended, appActive else { pauseMusicQueued(); return }
         do {
-            let session = AVAudioSession.sharedInstance()
-            try session.setCategory(.playback, mode: .default, options: [.mixWithOthers])
-            try session.setActive(true)
+            try prepareSession()
             let track = musicContext == "city" ? "kingdom" : musicContext
             if music == nil || loadedTrack != track {
                 guard let url = Bundle.main.url(forResource: track, withExtension: "m4a", subdirectory: "Web/audio") else { return }
@@ -326,7 +479,7 @@ final class GameAudio: NSObject, AVAudioPlayerDelegate {
                 if let old = music {
                     old.setVolume(0, fadeDuration: 0.7)
                     retiringMusic.append(old)
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) { [weak self, weak old] in
+                    queue.asyncAfter(deadline: .now() + 0.75) { [weak self, weak old] in
                         old?.stop()
                         self?.retiringMusic.removeAll { $0 === old }
                     }
@@ -334,7 +487,7 @@ final class GameAudio: NSObject, AVAudioPlayerDelegate {
                 if let layer = percussion {
                     layer.setVolume(0, fadeDuration: 0.7)
                     retiringMusic.append(layer)
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) { [weak self, weak layer] in layer?.stop(); self?.retiringMusic.removeAll { $0 === layer } }
+                    queue.asyncAfter(deadline: .now() + 0.75) { [weak self, weak layer] in layer?.stop(); self?.retiringMusic.removeAll { $0 === layer } }
                     percussion = nil
                 }
                 if musicContext == "battle", let layerURL = Bundle.main.url(forResource: "battle-pulse", withExtension: "m4a", subdirectory: "Web/audio"), let layer = try? AVAudioPlayer(contentsOf: layerURL) {
@@ -356,11 +509,11 @@ final class GameAudio: NSObject, AVAudioPlayerDelegate {
 
     private let effects: Set<String> = ["click", "hit", "cannon", "build", "recruit", "march", "defeat", "rally", "win", "achievement", "complete", "reward", "naval-fire", "naval-impact", "building-destroy", "wood-break", "water-splash"]
 
-    func update(enabled: Bool, volume: Double) {
+    func updateQueued(enabled: Bool, volume: Double) {
         guard volume.isFinite else { return }
         soundEnabled = enabled
         level = Float(max(0, min(1, volume)))
-        resumeMusic()
+        resumeMusicQueued()
         if !enabled {
             players.forEach { $0.stop() }
             players.removeAll()
@@ -369,8 +522,8 @@ final class GameAudio: NSObject, AVAudioPlayerDelegate {
         }
     }
 
-    func play(_ effect: String, volume: Double) {
-        guard soundEnabled, volume.isFinite, volume > 0 else { return }
+    func playQueued(_ effect: String, volume: Double) {
+        guard soundEnabled, !audioInterrupted, !routeSuspended, appActive, volume.isFinite, volume > 0 else { return }
         let name = effects.contains(effect) ? effect : "reward"
         let now = CACurrentMediaTime()
         let spacing: TimeInterval = ["hit", "march", "naval-fire", "naval-impact", "wood-break"].contains(name) ? 0.13 : 0.045
@@ -384,18 +537,26 @@ final class GameAudio: NSObject, AVAudioPlayerDelegate {
                 self?.effectDuck = 1; self?.updateMusicVolume(fade: 0.45); self?.updatePercussion()
             }
             duckRecovery = recovery
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.38, execute: recovery)
+            queue.asyncAfter(deadline: .now() + 0.38, execute: recovery)
         }
         guard let url = Bundle.main.url(forResource: name, withExtension: "wav", subdirectory: "Web/audio") else { return }
         do {
-            let session = AVAudioSession.sharedInstance()
-            try session.setCategory(.playback, mode: .default, options: [.mixWithOthers])
-            try session.setActive(true)
+            try prepareSession()
             players.removeAll { !$0.isPlaying }
             if players.count >= (reducedEffects ? 4 : 10) { players.removeFirst().stop() }
-            let player = try AVAudioPlayer(contentsOf: url)
+            let pool = effectPool[name] ?? []
+            let player: AVAudioPlayer
+            if let ready = pool.first(where: { !$0.isPlaying }) { player = ready }
+            else if let reusable = pool.first { reusable.stop(); player = reusable }
+            else {
+                player = try AVAudioPlayer(contentsOf: url)
+                player.prepareToPlay(); effectPool[name] = [player]
+            }
+            players.removeAll { $0 === player }
+            player.currentTime = 0
             player.volume = Float(max(0, min(1, volume))) * (reducedEffects ? 0.7 : 1)
             player.enableRate = true
+            player.rate = 1
             if ["hit", "march", "wood-break", "naval-impact"].contains(name) { player.rate = Float.random(in: 0.94...1.06) }
             player.delegate = self
             players.append(player)
@@ -405,8 +566,10 @@ final class GameAudio: NSObject, AVAudioPlayerDelegate {
         }
     }
 
-    func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
-        if player === music && musicContext == "victory" { musicContext = "city"; resumeMusic() }
+    func audioPlayerDidFinishPlayingQueued(_ player: AVAudioPlayer, successfully flag: Bool) {
+        // A pooled voice may already have been reused before its callback arrived.
+        guard !player.isPlaying else { return }
+        if player === music && musicContext == "victory" { musicContext = "city"; resumeMusicQueued() }
         players.removeAll { $0 === player }
     }
 }

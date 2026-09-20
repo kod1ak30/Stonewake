@@ -1,0 +1,30 @@
+{
+  "build": 17,
+  "assets": [
+    {
+      "path": "Stonewake/Web/art/build17/citizens.png",
+      "bytes": 2368672,
+      "sha256": "7b7b82fb9ca5e961abb5a66e430c1d96331b2309cbb5f9f3a41e61809bf9add2"
+    },
+    {
+      "path": "Stonewake/Web/art/build17/economy-buildings.png",
+      "bytes": 2175964,
+      "sha256": "686ffb469b591ae6410a8b4bf013e2b4b810c000da7b347457b5b422bf31aa8d"
+    },
+    {
+      "path": "Stonewake/Web/art/build17/keep-levels.png",
+      "bytes": 1659417,
+      "sha256": "448c0103bfeaab8bd3ddca01e6f8f23675754c5f44ec1b17d2d1cc656d9b275f"
+    },
+    {
+      "path": "Stonewake/Web/art/build17/keep-rear.png",
+      "bytes": 1843183,
+      "sha256": "22b0384c2dd91ea149d64c5f565c32a3636d72efd7a81c2e3a507af7b084275d"
+    },
+    {
+      "path": "Stonewake/Web/art/build17/vanguard-ranks.png",
+      "bytes": 1423995,
+      "sha256": "a2bdccb236bf19e8dc6f9191c187ef4b9b923f28d62b15b37bde654945d2c551"
+    }
+  ]
+}

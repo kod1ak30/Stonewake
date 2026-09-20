@@ -1,3 +1,7 @@
+// @ts-nocheck
+// Recovered as an ES module for build 15. Preserve saved-state and replay semantics.
+import { SWCreateShip14, SWFleetUnits14, SWNavalStep, SWOrders14, SWSeaEnemyUnits14, SWSeaObjective14, SWSeaStep14, SWValidateShipOrders14 } from "./naval.js";
+import { Cc, J, Nl, Oc, SWApplyTroopStats, SWEnemyNavalUnits, SWMedicHeals, SWMedicTarget, SWNavalStrike, SWNavalTarget, SWNavalUnit, SWSagaObjective, SWSagaSpawn, SWSagaStep, SWTroopDamageFactor, SWTroopIncomingFactor, SWTroopSplash, dl, fl, jl, ll, ml, sl, ul, wl } from "../../frontend/core/rules.js";
 function gl(e) {
   if(e.navalVersion===4)e={...e,shipOrders14:SWValidateShipOrders14(e,e.shipOrders14||[])};
   const swSea=e.campaignType==='sea'&&e.navalVersion===4;
@@ -545,3 +549,5 @@ function gl(e) {
     }
   );
 }
+
+export { gl };

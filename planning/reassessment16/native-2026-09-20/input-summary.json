@@ -1,0 +1,22 @@
+{
+  "effects_on": {
+    "samples": 4,
+    "seconds": 120.11,
+    "downs": 17,
+    "clicks": 17,
+    "missingClicks": 0,
+    "cancelled": 0,
+    "maxDOMDelayMs": 29,
+    "maxTimerLagMs": 118
+  },
+  "effects_off": {
+    "samples": 4,
+    "seconds": 98.8,
+    "downs": 22,
+    "clicks": 22,
+    "missingClicks": 0,
+    "cancelled": 0,
+    "maxDOMDelayMs": 209,
+    "maxTimerLagMs": 145
+  }
+}

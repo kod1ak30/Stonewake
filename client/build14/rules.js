@@ -1,3 +1,7 @@
+// @ts-nocheck
+// Recovered as an ES module for build 15. Preserve saved-state and replay semantics.
+import { Hl, J, Ll, Ml, Nl, Pl, Q, Rc, SWApplyTroopStats, SWBuildingCount, SWBuildingLimit, SWCapacity, SWCivicLevel, SWLegacyBl13, SWLegacyFleet13, SWLegacyUl13, SWLegacyY13, SWTroopAbilities, SWWalkable, Sl, Tc, X, Z, Zc, el, il, xl } from "../../frontend/core/rules.js";
+import { SWBuildingUpgradeStats17, SWCampaignProgress17, SWClaimHarborDepot17, SWCollectionQuote17, SWDepotStatus17, SWMigrateHarbor17, SWReserveVoyage17, SWShortfallTrades17, SWUnloadVoyage17 } from "../build17/gameplay.js";
 // Shared medieval progression and preparation rules. All mutations run through Ul.
 const SWFamilies14 = Object.freeze([
  {id:'vanguard',name:'Vanguard',role:'Protect and hold the breach',kinds:['infantry','shieldbearer','spearman'],default:'infantry'},
@@ -21,6 +25,7 @@ function SWMigrate14(state){
   state.medievalVersion=14;
  }
  state.seaCampaign=Math.max(0,Math.min(10,state.seaCampaign||0));
+ SWMigrateHarbor17(state);
  return state;
 }
 function Y(state,now=Date.now()){return SWMigrate14(SWLegacyY13(state,now));}
@@ -33,14 +38,15 @@ function SWUpgradeQuote14(state,building){
  add('builders',Rc(state)>0?'Construction crew available':'All construction crews are working',Rc(state)>0,{type:'projects'});
  if(building.kind!=='keep')add('keep','Keep '+next,Ml(state)>=next,{type:'buildingKind',kind:'keep'});
  else{
-  add('campaign',level+' land strongholds captured',(state.campaign||0)>=level,{type:'land'});
+  const progress=SWCampaignProgress17(state);
+  add('campaign',progress.total+' / '+level+' first victories across Land or Sea',progress.total>=level,{type:progress.sea>progress.land?'sea':'land'});
   for(const kind of (level>=2?['barracks','quarry']:['barracks']))add(kind,Sl[kind].name+' '+level,state.buildings.some(b=>b.kind===kind&&b.level>=level),{type:'buildingKind',kind});
  }
  const needed=Math.max(...Object.values(cost)),storeCount=SWBuildingCount(state,'storehouse'),canBuildStore=storeCount<SWBuildingLimit(state,'storehouse');
  add('storage','Storage '+Math.floor(capacity).toLocaleString()+' / '+needed.toLocaleString(),needed<=capacity,canBuildStore?{type:'build',kind:'storehouse'}:{type:'buildingKind',kind:'storehouse'});
  const shortfall=Object.fromEntries(xl.map(k=>[k,Math.max(0,Math.ceil(cost[k]-state.resources[k]))]));
  add('supplies','Supplies for this upgrade',!Object.values(shortfall).some(Boolean),{type:'storage'});
- return {allowed:requirements.every(r=>r.met),requirements,level,next,max,cost,capacity,shortfall,duration:Zc(state,building.kind,next)*(1-Math.min(.3,SWCivicLevel(state,'workshop')*.03)),benefit:Bl({...building,level:next}),reason:requirements.find(r=>!r.met)?.text||null};
+ return {allowed:requirements.every(r=>r.met),requirements,level,next,max,cost,capacity,shortfall,deltas:SWBuildingUpgradeStats17(state,building),trades:SWShortfallTrades17(state,cost),duration:Zc(state,building.kind,next)*(1-Math.min(.3,SWCivicLevel(state,'workshop')*.03)),benefit:Bl({...building,level:next}),reason:requirements.find(r=>!r.met)?.text||null};
 }
 function Vl(state,building){return SWUpgradeQuote14(state,building).reason;}
 function $c(state,building){return SWUpgradeQuote14(state,building).requirements.find(r=>!r.met&&['campaign','barracks','quarry'].includes(r.id))?.text||null;}
@@ -92,6 +98,7 @@ function SWLayoutAction14(state,action,now){
 }
 function Ul(state,action,now=Date.now()){
  const current=Y(state,now);
+ if(action.type==='claimHarborDepot'){SWClaimHarborDepot17(current);SWMigrateHarbor17(current);current.revision++;return current;}
  if(action.type==='upgrade'){
   const b=current.buildings.find(b=>b.id===action.id),q=SWUpgradeQuote14(current,b);if(!q.allowed)throw Error(q.requirements.filter(r=>!r.met).map(r=>r.text).join(' · '));
  }
@@ -108,16 +115,21 @@ function Ul(state,action,now=Date.now()){
  if(action.type==='commitLayout')return SWLayoutAction14(current,action,now);
  if(action.type==='collectFleet'){
   let collected=false;for(const ship of current.fleet){if(ship.voyage&&ship.voyage.readyAt<=now){try{ol(current,{type:'collectVoyage',id:ship.id},now);collected=true;}catch{}}}
-  if(!collected)throw Error('No returned cargo fits in storage yet.');current.revision++;return current;
+  if(!collected)throw Error('No returned trade cargo is ready to unload.');SWMigrateHarbor17(current);current.revision++;return current;
  }
  const result=SWLegacyUl13(current,action,now);if(action.type==='move'&&action.facing!==undefined){if(!Number.isInteger(action.facing)||action.facing<0||action.facing>3)throw Error('Choose a valid building rotation.');const b=result.buildings.find(b=>b.id===action.id);if(b)b.facing=action.facing;}return result;
 }
 
 function ol(state,action,now){
+ if(action.type==='voyage'){
+  const preview={...state,fleet:state.fleet.map(ship=>({...ship}))};
+  SWLegacyFleet13(preview,action,now);
+  const voyage=preview.fleet.find(ship=>ship.id===action.id).voyage;
+  SWReserveVoyage17(state,voyage.reward);
+  state.fleet.find(ship=>ship.id===action.id).voyage=voyage;return true;
+ }
  if(action.type==='collectVoyage'){
-  const ship=state.fleet?.find(s=>s.id===action.id);if(!ship?.voyage||ship.voyage.readyAt>now)throw Error('This ship has not returned yet.');
-  const cap=SWCapacity(state),reward=ship.voyage.reward,received=Object.fromEntries(xl.map(k=>[k,Math.min(reward[k]||0,Math.max(0,Math.floor(cap-state.resources[k])))]));
-  if(!Object.values(received).some(Boolean))throw Error('Make room in storage for this cargo.');Ll(state,received);for(const k of xl)reward[k]=Math.max(0,(reward[k]||0)-received[k]);if(!Object.values(reward).some(Boolean))delete ship.voyage;return true;
+  SWUnloadVoyage17(state,state.fleet?.find(ship=>ship.id===action.id),now);SWMigrateHarbor17(state);return true;
  }
  if(action.type==='landscape'){
   if(!SWWalkable(state,action.x,action.y))throw Error('Choose a buildable plot or the harbor promenade.');
@@ -132,3 +144,5 @@ function ol(state,action,now){
  }
  return SWLegacyFleet13(state,action,now);
 }
+
+export { SWFamilies14, SWFamily14, SWMigrate14, Y, SWUpgradeQuote14, Vl, $c, Bl, SWLoadout14, SWValidateLoadout14, SWSelectedArmy14, SWTrainQuote14, SWTroopStats14, SWEquipment14, SWEquipmentName14, SWLayoutAction14, Ul, ol, SWBuildingUpgradeStats17, SWCampaignProgress17, SWCollectionQuote17, SWDepotStatus17, SWShortfallTrades17 };

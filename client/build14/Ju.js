@@ -1,5 +1,20 @@
+// @ts-nocheck
+// Recovered as an ES module for build 15. Preserve saved-state and replay semantics.
+import { As, Bs, C, De, Ee, F, Fs, Is, Ls, N, Ns, O, Ps, Vs, ae, be, ce, ge, ic, ie, j, je, k, me, ne, oe, re, se, te, ve, we, xe, yc, ye, zs } from "../../frontend/vendor/runtime.js";
+import { Bl, SWSelectedArmy14, Ul, Y } from "./rules.js";
+import { Fu, SWCanDeploy14, SWCreateBattle14, SWDeploymentOrder14, SWSeaChapters14, SWValidateShipOrders14 } from "./naval.js";
+import { Al, Dl, El, Gc, Gl, Ic, Il, J, Jl, Kl, Lc, Ml, Nl, Oc, Ol, Pl, Rc, SWAppearance, SWCanPlace, SWChapter, SWCity, SWCivicBonuses, SWCivicProject, SWPremiumCatalog, SWRaidInput, SWRaidStatus, SWResolveDefense, SWSagaInput, SWSagaSettle, SWSettleScheduledRaid, Sl, Tc, Vc, Wc, Wl, X, Z, Zc, al, hl, wl, xl, zl } from "../../frontend/core/rules.js";
+import { Au, Gu, Hu, Ku, Mu, Nu, Pu, Qc, Rl, Ru, SWCanPlaceOrnament, SWMarketTrade, SWMissionScout, SWUseMusic, Uu, Wu, Xc, Yc, au, ju, kl, ou, pu, qu, zu } from "../../frontend/legacy/presentation.js";
+import { SWActionNames15, SWCoach15, SWLandscapeGuard15, SWRecord15, SWScreenNames15, SWUseExperience15, SWWelcome15 } from "../build15/experience.js";
+import { SWBattleWorker } from "./gestures.js";
+import {nativeSaveStatus} from "../../frontend/runtime/native-save-status.js";
+import { createBattleForecast } from "../../frontend/runtime/battle-forecast.js";
+import { SWAchievements, SWAppFrame, SWCityHub, SWGems, SWLegacyContent, SWNotice, SWObjectives, SWOnlineFrontierGate, SWResourceBar, SWResultActions17, SWResultContent, SWSettings, SWStorage, swElement } from "../interface.js";
+import { SWArmy, SWBattleControls, SWBuildMenu14, SWBuildingDetails14, SWCampaignBoard14, SWLayoutBar14, SWMainMenu, SWQuickNav, SWScout, iu } from "./ui.js";
+import { Eu } from "./Eu.js";
+import { SWChronicle, SWPremiumStore } from "../premium-ui.js";
 function Ju({ deviceOnly: e = !1 } = {}) {
-  const [battlePrep14,setBattlePrep14]=C.useState(null),[selectedShip14,setSelectedShip14]=C.useState(null),[navalTool14,setNavalTool14]=C.useState(null);
+  const [selectedShip14,setSelectedShip14]=C.useState(null),[navalTool14,setNavalTool14]=C.useState(null);
   const [layout14,setLayout14]=C.useState(null),layoutRef14=C.useRef(null),[layoutOverlay14,setLayoutOverlay14]=C.useState('plots'),navHistory14=C.useRef(['capital']),scoutReturn14=C.useRef(null),requirementTrail14=C.useRef([]);layoutRef14.current=layout14;
   function SWStartLayout14(){const base=Y(r.current);const draft={base,states:[base],actions:[],index:0};layoutRef14.current=draft;setLayout14(draft);p('capital');ee('road');}
   function SWEditAct14(action,message){
@@ -14,18 +29,19 @@ function Ju({ deviceOnly: e = !1 } = {}) {
    if(action.type==='build'){gn(action.kind);return}
    if(action.type==='buildingKind'){const candidates=V.buildings.filter(b=>b.kind===action.kind).sort((a,b)=>b.level-a.level);if(candidates[0]){SWNavigate('capital');h(candidates[0].id)}else gn(action.kind);return}
    if(action.type==='land'){SWNavigate('frontier');nt('campaign');return}
+   if(action.type==='sea'){SWNavigate('frontier');nt('sea');return}
    if(action.type==='projects'){setGemShopOpen(true);return}
    SWNavigate('storage');
   }
   function SWShipCommand14(command){
-   if(St||B)return;
+   if(St||B||!z||swSimulationError15.current)return;
    if(['move','focus'].includes(command.type)){setNavalTool14(command);return}
    const input=swBattleInput.current;if(!input||input.navalVersion!==4||B||St)return;
    const order={...command,time:Math.min(119.5,Math.ceil(lt*4)/4)};
    if(c.current==='cloud'&&L?.kind!=='practice'){swOnlineQueue.current?.enqueue({type:'ship',order});return}
    const next={...input,shipOrders14:[...(input.shipOrders14||[]),order]};try{SWValidateShipOrders14(next,next.shipOrders14);SWQueueSimulation(next);He('click')}catch(error){ic.error(error.message)}setNavalTool14(null);
   }
-  function SWNavalMap14(x,y,targetId){if(!navalTool14||St||B)return;const command={...navalTool14,...(navalTool14.type==='focus'?{targetId}:{x,y})};setNavalTool14(null);const input=swBattleInput.current;if(!input)return;const order={...command,time:Math.min(119.5,Math.ceil(lt*4)/4)};try{SWValidateShipOrders14(input,[...(input.shipOrders14||[]),order]);if(c.current==='cloud'&&L?.kind!=='practice')swOnlineQueue.current?.enqueue({type:'ship',order});else SWQueueSimulation({...input,shipOrders14:[...(input.shipOrders14||[]),order]})}catch(error){ic.error(error.message)}}
+  function SWNavalMap14(x,y,targetId){if(!navalTool14||St||B||!z||swSimulationError15.current)return;const command={...navalTool14,...(navalTool14.type==='focus'?{targetId}:{x,y})};setNavalTool14(null);const input=swBattleInput.current;if(!input)return;const order={...command,time:Math.min(119.5,Math.ceil(lt*4)/4)};try{SWValidateShipOrders14(input,[...(input.shipOrders14||[]),order]);if(c.current==='cloud'&&L?.kind!=='practice')swOnlineQueue.current?.enqueue({type:'ship',order});else SWQueueSimulation({...input,shipOrders14:[...(input.shipOrders14||[]),order]})}catch(error){ic.error(error.message)}}
 
   const [cityOpen,setCityOpen]=C.useState(false);
   const [premiumStore,setPremiumStore]=C.useState(null),[chronicleTab,setChronicleTab]=C.useState(null),[ornamentPlacement,setOrnamentPlacement]=C.useState(null);
@@ -37,6 +53,7 @@ function Ju({ deviceOnly: e = !1 } = {}) {
   const [settingsSection,setSettingsSection]=C.useState('Audio');
   const swOnlineEpoch=C.useRef(0),swOnlineQueue=C.useRef(null),swOnlineRevision=C.useRef(0),swOnlineOffset=C.useRef(null),swLocalEnvelope=C.useRef(null),swOnlineRetreat=C.useRef(false);
   const [onlineBattleError,setOnlineBattleError]=C.useState('');
+  const [simulationError15,setSimulationError15]=C.useState(''),swSimulationError15=C.useRef('');
   const swBattleInput=C.useRef(null),swBattleRuntime=C.useRef(null),swSimulationPending=C.useRef(false),swFinishing=C.useRef(false);
   const swRaidRuntime=C.useRef(null),swRaidPending=C.useRef(false),swRaidFailure=C.useRef(0),swCurrentBattle=C.useRef(null);
   C.useEffect(()=>()=>{swBattleRuntime.current?.close();swRaidRuntime.current?.close()},[]);
@@ -197,6 +214,8 @@ function Ju({ deviceOnly: e = !1 } = {}) {
               : `Settler`,
     sn = (0, C.useRef)(null),
     cn = (0, C.useRef)(null);
+  const experience15=SWUseExperience15({state:t,ready:o==='practice'||o==='cloud',battle:L,result:B,replay:St});
+  function SWGuideAction15(destination){if(destination==='keep'){SWNavigate('capital');h('keep')}else if(destination==='projects'){setGemShopOpen(true)}else if(destination.startsWith('build:')){SWNavigate('capital');gn(destination.slice(6))}else SWNavigate(destination)}
   SWUseMusic(B?(B.result.won?'victory':'calm'):L?'battle':I?'scout':'calm',stonewakeMusic,L?battleMusicVolume:musicVolume);
   swFeedback.current={haptics,replay:St};
   swBattleInput.current=R;
@@ -215,7 +234,7 @@ function Ju({ deviceOnly: e = !1 } = {}) {
       current.revision++;r.current=current;n(current);
       yt(reports=>[{id:input.raidId,kind:'defense',input,result,reward:outcome.reward,lost:outcome.lost,loot:outcome.loot,defenseReport:outcome.defenseReport,createdAt:Date.now(),defending:true},...reports].slice(0,20));
       Ue({title:outcome.won?'Your city repelled the raiders':'Raid resolved',detail:outcome.won?'Your defenses held. Open City to see the report.':'Open City to see losses and improve your defenses.',icon:'shield'});He(outcome.won?'win':'defeat');
-    },()=>{swRaidPending.current=false;swRaidFailure.current=Date.now()+60000});
+    },()=>{swRaidPending.current=false;swRaidRuntime.current?.close();swRaidRuntime.current=null;swRaidFailure.current=Date.now()+60000});
   },[o,i,!!L]);
   (0, C.useEffect)(() => {
     if (o !== `cloud` && o !== `practice`) return;
@@ -312,7 +331,7 @@ function Ju({ deviceOnly: e = !1 } = {}) {
   function SWBeginOnlineBattle(battle,serverTime) {
     swOnlineQueue.current?.stop();swOnlineRetreat.current=false;setOnlineBattleError('');
     swOnlineQueue.current=window.SWOnlineGame.battleQueue({battle,serverTime,onInput:SWQueueSimulation,onState:SWApplyOnlineGame,onError:error=>setOnlineBattleError(error.message||'Orders are waiting for a connection. Retry to continue.')});
-    swBattleInput.current=battle.input;ot(battle);st(battle.input);ct(Kl(battle.input));ut(swOnlineQueue.current.elapsed());ft(1);pt(null);Ct(false);Et.current=false;
+    ot(battle);SWQueueSimulation(battle.input,true);ut(swOnlineQueue.current.elapsed());ft(1);pt(null);Ct(false);Et.current=false;
     M(Object.keys(J).find(kind=>hl(battle.input)[kind]>0)||'infantry');
   }
   async function SWRefreshOnline() {
@@ -377,8 +396,7 @@ function Ju({ deviceOnly: e = !1 } = {}) {
             e.input &&
             t.activeBattle === e.battle.id &&
             (ot(e.battle),
-            st(e.input),
-            ct(Kl(e.input)),
+            SWQueueSimulation(e.input,true),
             ut(e.time || 0),
             (Et.current = !1)));
       }
@@ -400,19 +418,20 @@ function Ju({ deviceOnly: e = !1 } = {}) {
           L
         )
           return;
-        Mu({
+        const saveStatus = Mu({
           state: t,
           reports: vt,
           battle: t.activeBattle ? L : null,
           input: t.activeBattle ? R : null,
           time: Math.floor(lt),
-        }) === `saved` && Mt(!0);
+        });
+        Mt(saveStatus === `pending` ? null : saveStatus === `saved`);
       } catch {
         Mt(!1);
       }
   }, [o, t, vt, L, R, Math.floor(lt / 3)]),
     (0, C.useEffect)(() => {
-      let e = (e) => Mt(e.detail?.saved === !0);
+      let e = (e) => { const saved = nativeSaveStatus.acknowledge(e.detail); if (saved !== null) Mt(saved); };
       return (
         window.addEventListener(`stonewake-save-status`, e),
         () => window.removeEventListener(`stonewake-save-status`, e)
@@ -427,7 +446,7 @@ function Ju({ deviceOnly: e = !1 } = {}) {
               (n(Y(t.state)),
               yt(t.reports || []),
               t.battle && t.input
-                ? (ot(t.battle), st(t.input), ct(Kl(t.input)), ut(t.time || 0))
+                ? (ot(t.battle), SWQueueSimulation(t.input,true), ut(t.time || 0))
                 : t.state.activeBattle || (ot(null), st(null), ct(null)));
           } catch {}
       };
@@ -531,8 +550,10 @@ function Ju({ deviceOnly: e = !1 } = {}) {
                 ));
         if(e.type==='festival'){Ue({title:'The town is celebrating!',detail:'+15% resource production for '+(10+SWCivicBonuses(o).festivalMinutes)+' minutes.',icon:'users',grand:true});He('achievement');}
         if(e.type==='landscape'){He('build');window.dispatchEvent(new CustomEvent('hearth-burst',{detail:{x:e.x,y:e.y,label:Tc[e.kind].name}}));}
+        SWRecord15('action_ok',{action:SWActionNames15.indexOf(e.type)});
         return o;
       } catch (e) {
+        SWRecord15('action_blocked');
         return (
           ic.error(e instanceof Error ? e.message : `Something went wrong.`),
           null
@@ -630,6 +651,7 @@ function Ju({ deviceOnly: e = !1 } = {}) {
       if (
         !L ||
         !z ||
+        simulationError15 ||
         B ||
         (R?.rulesVersion === 4 &&
           !St &&
@@ -650,9 +672,9 @@ function Ju({ deviceOnly: e = !1 } = {}) {
           ((e = t), ut((e) => Math.min(z.duration, e + n)));
         }, 50);
       return () => clearInterval(t);
-    }, [L, z, B, dt, R?.orders?.length, R?.navalAt, R?.navalSupport, R?.fleet14, St, o]),
+    }, [L, z, B, dt, R?.orders?.length, R?.navalAt, R?.navalSupport, R?.fleet14, St, o, simulationError15]),
     (0, C.useEffect)(() => {
-      z && L && !swSimulationPending.current && lt >= z.duration && !Et.current && ((Et.current = !0), xn());
+      z && L && !swSimulationError15.current && !swSimulationPending.current && lt >= z.duration && !Et.current && ((Et.current = !0), xn());
     }, [lt, z, L]),
     (0, C.useEffect)(()=>()=>{swOnlineQueue.current?.stop()},[]));
   async function hn() {
@@ -674,12 +696,15 @@ function Ju({ deviceOnly: e = !1 } = {}) {
     f === `frontier` && tt === `rivals` && hn();
   }, [f, tt, o]);
   function SWNavigate(destination) {
+    SWRecord15('screen_open',{screen:SWScreenNames15.indexOf(destination)});
     if(layoutRef14.current&&destination!=='capital'){ic('Save or cancel your layout first.',{id:'layout-navigation'});return;}
     if(destination==='close'){navHistory14.current=['capital'];requirementTrail14.current=[];destination='capital';}
     if(destination==='back'){if(requirementTrail14.current.length)destination='building:'+requirementTrail14.current.pop();else{navHistory14.current.pop();destination=navHistory14.current.pop()||'capital';}}
     if(navHistory14.current.at(-1)!==destination)navHistory14.current.push(destination);
     setStonewakeMenuOpen(false);setPremiumStore(null);setChronicleTab(null);setOrnamentPlacement(null); x(false); w(false); Ut(false); Je(false); Fe(false); de(false); Ne(false); Lt(false); setCityOpen(false); setStorageOpen(false); setGemShopOpen(false); setStonewakeObjectiveOpen(false); rt(null);
     h(null); _(null); y(null); Ft(null); Gt([]); ee(null); He('click');SWHaptic('select');
+    // Build is itself a modal. Retire it before mounting the destination dialog.
+    if(f==='build'&&destination!=='build')p('capital');
     if(destination==='capital'||destination==='build'||destination==='frontier')p(destination);
     else if(destination.startsWith('building:')){p('capital');h(destination.slice(9))}
     else if(destination==='sea'){p('frontier');nt('sea')}
@@ -690,7 +715,7 @@ function Ju({ deviceOnly: e = !1 } = {}) {
     else if(destination==='fleet')w(true);
     else if(destination==='storage')setStorageOpen(true);
     else if(destination==='gems'||destination==='store'||destination==='wardrobe')setPremiumStore({tab:destination==='gems'?'Gems':'Wardrobe',owned:destination==='wardrobe'});
-    else if(['chronicle','events','residents'].includes(destination))setChronicleTab(destination==='events'?'Events':destination==='residents'?'Residents':'Chapter');
+    else if(['chronicle','trials','events','residents'].includes(destination))setChronicleTab(destination==='trials'?'Trials':destination==='events'?'Events':destination==='residents'?'Residents':'Chapter');
     else if(destination==='town')Lt(true);
     else if(destination==='plan')SWStartLayout14();
     else if(destination==='commander')Ut(true);
@@ -705,7 +730,7 @@ function Ju({ deviceOnly: e = !1 } = {}) {
     if(requirement.action==='building'){SWNavigate('capital');const b=V.buildings.find(b=>b.kind===requirement.buildKind);if(b)h(b.id);return}
     SWNavigate(requirement.action==='chronicle'?'chronicle':requirement.action||'city');
   }
-  function SWStartAdventure(scout){setChronicleTab(null);setStonewakeMenuOpen(false);yn(scout)}
+  function SWStartAdventure(scout){setChronicleTab(null);setStonewakeMenuOpen(false);yn(scout,scout.kind==='trial'?'trials':'chronicle')}
   function SWPlaceDecoration(id){SWNavigate('capital');setOrnamentPlacement(id);setBuildFacing(0);Ft(null)}
   function SWOpenCoast() {
     p(`capital`); h(null); _(null); y(null); ee(null); Ft(null); Gt([]); D(value=>value+1);
@@ -753,8 +778,17 @@ function Ju({ deviceOnly: e = !1 } = {}) {
         (await SWEditAct14({ type: `move`, id: v, x: e, y: t, facing: buildFacing }, `Building moved`)) &&
         (y(null), Ft(null), h(v));
   }
-  function yn(e) {
-    setBattlePrep14(null);setSelectedShip14(null);setNavalTool14(null);setNavalId('');
+  function yn(e,origin) {
+    // Preparation is a real screen in the Back stack, including supplied missions.
+    // A new mission replaces the single saved preparation; older entries cannot restore it.
+    navHistory14.current=navHistory14.current.filter(screen=>screen!=='scout');
+    const previous=navHistory14.current.at(-1)||'capital';
+    const source=origin||(f==='frontier'?(tt==='sea'?'sea':'frontier'):previous);
+    if((source==='sea'&&previous==='frontier')||(['chronicle','trials'].includes(source)&&['chronicle','trials','events','residents','achievements','reports'].includes(previous)))navHistory14.current[navHistory14.current.length-1]=source;
+    else if(previous!==source)navHistory14.current.push(source);
+    scoutReturn14.current=e;
+    navHistory14.current.push('scout');
+    setSelectedShip14(null);setNavalTool14(null);setNavalId('');
     (rt(e),
       at(`center`),
       qt({
@@ -764,9 +798,14 @@ function Ju({ deviceOnly: e = !1 } = {}) {
         cannon: `center`,
       }));
   }
-  async function bn() {
+  function SWCloseScout16() {
+    if(navHistory14.current.at(-1)==='scout')navHistory14.current.pop();
+    scoutReturn14.current=null;
+    rt(null);
+  }
+  async function bn(preparation) {
     if (!(!I || d.current)) {
-      if (Qt < 3 && !I.fixedArmy) {
+      if (Qt < 3 && !I.fixedArmy && !I.practiceKind) {
         ic.error(`Recruit at least three soldiers first.`);
         return;
       }
@@ -779,7 +818,7 @@ function Ju({ deviceOnly: e = !1 } = {}) {
           e={id:'expedition-'+now,kind:I.kind,missionId:I.missionId,trialId:I.trialId,input,createdAt:now};
           state.activeBattle=e.id;state.revision++;r.current=state;n(state);
         } else if (o === `practice` || I.kind === `practice`) {
-          let t = SWCreateBattle14(I.practiceKind?{...Y(r.current),army:{...wl(),[I.practiceKind]:Math.min(12,Pl(Y(r.current)))}}:Y(r.current),I,I.practiceKind?{army:{...wl(),[I.practiceKind]:Math.min(12,Pl(Y(r.current)))}}:battlePrep14,Math.floor(Math.random()*4294967295));
+          let t = SWCreateBattle14(I.practiceKind?{...Y(r.current),army:{...wl(),[I.practiceKind]:Math.min(12,Pl(Y(r.current)))}}:Y(r.current),I,I.practiceKind?{army:{...wl(),[I.practiceKind]:Math.min(12,Pl(Y(r.current)))}}:preparation,Math.floor(Math.random()*4294967295));
           if (
             ((e = {
               id: `practice-${Date.now()}`,
@@ -795,18 +834,17 @@ function Ju({ deviceOnly: e = !1 } = {}) {
             (Object.keys(J).forEach(k=>{t.army[k]=Math.max(0,(t.army[k]||0)-(e.input.army[k]||0))}), (t.activeBattle=e.id),t.revision++,r.current=t,n(t));
           }
         } else {
-          const response=await window.SWOnline.request('/v1/battles/start',{method:'POST',body:{requestId:window.SWOnlineGame.requestId(),revision:swOnlineRevision.current,kind:I.kind,missionId:I.missionId,trialId:I.trialId,campaignIndex:I.campaignIndex,provinceId:I.provinceId,targetId:I.rivalId||I.id,army:battlePrep14?.army||SWSelectedArmy14(V),fleet:battlePrep14?.fleet,navalShipId:navalId||undefined,combatVersion:14}});
+          const response=await window.SWOnline.request('/v1/battles/start',{method:'POST',body:{requestId:window.SWOnlineGame.requestId(),revision:swOnlineRevision.current,kind:I.kind,missionId:I.missionId,trialId:I.trialId,campaignIndex:I.campaignIndex,provinceId:I.provinceId,targetId:I.rivalId||I.id,army:preparation?.army||SWSelectedArmy14(V),fleet:I.kind==='sea'?preparation?.fleet:[],navalShipId:navalId||undefined,combatVersion:14}});
           if(c.current!=='cloud'||epoch!==swOnlineEpoch.current)return;
           SWApplyOnlineGame(response);e=response.battle;SWBeginOnlineBattle(e,response.serverTime);
         }
         (M(Object.keys(J).find((t) => e.input.army[t] > 0) || `infantry`),
           ot(e),
-          st(e.input),
-          ct(Kl(e.input)),
+          (o!=='cloud'||e.kind==='practice')&&SWQueueSimulation(e.input,true),
           ut(o==='cloud'&&e.kind!=='practice'?(swOnlineQueue.current?.elapsed()||0):0),
           ft(1),
           pt(null),
-          rt(null),
+          SWCloseScout16(),
           Ct(!1),
           _t(``),
           (Et.current = !1),
@@ -825,18 +863,18 @@ function Ju({ deviceOnly: e = !1 } = {}) {
     if(c.current!=='practice'){ic('Computer raids are available in your local kingdom.');return;}
     const input=SWRaidInput(state,Date.now(),false),battle={id:input.raidId,kind:'defense',input,createdAt:Date.now()};
     state.activeBattle=battle.id;state.revision++;n(state);r.current=state;
-    setCityOpen(false);ot(battle);st(input);ct(Kl(input));ut(0);ft(1);pt(null);Ct(false);Et.current=false;He('march');
+    setCityOpen(false);ot(battle);SWQueueSimulation(input,true);ut(0);ft(1);pt(null);Ct(false);Et.current=false;He('march');
   }
   async function xn() {
     if (!(!L || !R || !z)) {
-      if(swFinishing.current)return;
+      if(swFinishing.current||swSimulationPending.current||swSimulationError15.current)return;
       const onlineEpoch=swOnlineEpoch.current,battleStartingGems=r.current.gems;
       swFinishing.current=true;
       (ht(!0), _t(``));
       try {
         let e,
           t = Gu,
-          { frames: i, ...a } = Kl(R);
+          { frames: i, ...a } = R.rulesVersion===4 ? z : Kl(R);
         e=a;
         if(o==='practice'&&!St&&L.kind!=='practice'&&r.current.activeBattle!==L.id){
           const saved=vt.find(report=>report.id===L.id);
@@ -907,17 +945,20 @@ function Ju({ deviceOnly: e = !1 } = {}) {
       }
     }
   }
-  function SWQueueSimulation(input) {
+  function SWQueueSimulation(input,reset=false) {
     swBattleInput.current=input;
     st(input);
-    if(input.rulesVersion!==4){ct(Kl(input));return;}
-    swSimulationPending.current=true;
-    swBattleRuntime.current ||= SWBattleWorker();
-    swBattleRuntime.current.request(input,(result,meta)=>{swSimulationPending.current=!!meta?.pending;ct(result)},error=>{swSimulationPending.current=false;_t(error)});
+    swBattleRuntime.current ||= createBattleForecast({simulateLegacy:Kl,openRuntime:SWBattleWorker,onChange:forecast=>{
+      swSimulationPending.current=forecast.pending;
+      swSimulationError15.current=forecast.error;
+      setSimulationError15(forecast.error);
+      ct(forecast.result);
+    }});
+    swBattleRuntime.current.request(input,{reset});
   }
   function Sn(e, t, options = {}) {
     const input=swBattleInput.current,kind=options.kind||le;
-    if (!input || input.rulesVersion !== 4 || St || B || mt || lt >= 119.5 || (L?.kind==='defense'||input.saga?.mode==='hold')) return false;
+    if (!input || !z || swSimulationError15.current || input.rulesVersion !== 4 || St || B || mt || lt >= 119.5 || (L?.kind==='defense'||input.saga?.mode==='hold')) return false;
     if (!SWCanDeploy14(input, e, t)) {
       if (!options.silent) ic(input.campaignType==='sea'?`Choose a beach along the western shore.`:`Deploy along the outside edge.`, {id:`deployment-hint`, duration:1000});
       return false;
@@ -946,13 +987,13 @@ function Ju({ deviceOnly: e = !1 } = {}) {
     return true;
   }
   function Cn() {
-    if (!R || St || B) return;
+    if (!R || !z || swSimulationError15.current || St || B) return;
     if(c.current==='cloud'&&L.kind!=='practice'){swOnlineRetreat.current=true;void xn();return;}
     let e = { ...R, retreatAt: Math.ceil(lt * 2) / 2 };
     (SWQueueSimulation(e), ut(e.retreatAt));
   }
   function wn() {
-    if (!R || R.rallyAt !== void 0 || St || B || R.saga?.mode==='hold') return;
+    if (!R || !z || swSimulationError15.current || R.rallyAt !== void 0 || St || B || R.saga?.mode==='hold') return;
     if(c.current==='cloud'&&L.kind!=='practice'){if(swOnlineQueue.current?.enqueue({type:'rally'}))He('rally');return;}
     let e = { ...R, rallyAt: Math.round(lt * 2) / 2 };
     (SWQueueSimulation(e),
@@ -965,7 +1006,7 @@ function Ju({ deviceOnly: e = !1 } = {}) {
       ic(`Rally! Your troops recover health and fight harder for 7 seconds.`));
   }
   function Tn() {
-    if (!R?.commander || R.heroAt !== void 0 || St || B || R.saga?.mode==='hold') return;
+    if (!R?.commander || !z || swSimulationError15.current || R.heroAt !== void 0 || St || B || R.saga?.mode==='hold') return;
     if(c.current==='cloud'&&L.kind!=='practice'){if(swOnlineQueue.current?.enqueue({type:'ability'}))He('rally');return;}
     let e = { ...R, heroAt: Math.round(lt * 2) / 2 };
     (SWQueueSimulation(e), He(`rally`));
@@ -981,12 +1022,13 @@ function Ju({ deviceOnly: e = !1 } = {}) {
     );
   }
   function SWFireBroadside() {
-    if(!R?.navalSupport || R.navalAt!==undefined || St || B || mt || lt>=119.5) return;
+    if(!R?.navalSupport || !z || swSimulationError15.current || R.navalAt!==undefined || St || B || mt || lt>=119.5) return;
     const input={...R,navalAt:Math.ceil(lt*2)/2};
-    st(input);ct(Kl(input));He('cannon');
+    SWQueueSimulation(input);He('cannon');
   }
   function En() {
     swBattleRuntime.current?.cancel();swSimulationPending.current=false;
+    navHistory14.current=['capital'];scoutReturn14.current=null;
     (ot(null),
       ct(null),
       st(null),
@@ -997,6 +1039,11 @@ function Ju({ deviceOnly: e = !1 } = {}) {
       Ct(!1),
       Tt(!1),
       (Et.current = !1));
+  }
+  function SWResultNavigate17(destination) {
+    En();requirementTrail14.current=[];
+    if(['land','sea','provinces','rivals'].includes(destination)){SWNavigate('frontier');nt(destination==='land'?'campaign':destination);}
+    else SWNavigate(destination);
   }
   async function Dn() {
     if ((setChronicleTab('Reports'), xt(``), o === `cloud`))
@@ -1011,8 +1058,7 @@ function Ju({ deviceOnly: e = !1 } = {}) {
     (Tt(e.defending&&!e.input?.saga),
       Fe(!1),
       ot({ id: e.id, kind: e.kind, input: e.input, createdAt: e.createdAt }),
-      st(e.input),
-      ct(Kl(e.input)),
+      SWQueueSimulation(e.input,true),
       ut(0),
       pt(null),
       Ct(!0),
@@ -1067,10 +1113,9 @@ function Ju({ deviceOnly: e = !1 } = {}) {
     className: `game-shell toolbar-layout${L ? ` battle-active` : ``}${stonewakeMenuOpen ? ` menu-open` : ``}${stonewakeObjectiveOpen ? ` objective-open` : ``}`,
     "data-effects": Be || reducedEffects ? `reduced` : `full`,
     children: [
-      fe &&
-        o !== `loading` &&
-        !L &&
-        (0, F.jsx)(Ou, { onFinish: Ae, reduced: Be }),
+      swElement(SWLandscapeGuard15),
+      !L&&swElement(SWWelcome15,{guide:experience15.guide,onBegin:()=>{experience15.saveGuide({...experience15.guide,welcome:false});Ae()},onSkip:()=>{experience15.skip();Ae()}}),
+      !L&&f==='capital'&&!H&&!b&&!S&&!cityOpen&&!ue&&!I&&!premiumStore&&!chronicleTab&&!storageOpen&&!gemShopOpen&&!Me&&!Ht&&!stonewakeMenuOpen&&!layout14&&!g&&!v&&!ornamentPlacement&&swElement(SWCoach15,{state:V,guide:experience15.guide,onChange:experience15.saveGuide,onSkip:experience15.skip,onAction:SWGuideAction15}),
       !L && (0, F.jsx)(SWNotice, { event: Ve, onDismiss: dismissNotice }),
       (0, F.jsx)(yc, {
         position: `top-center`,
@@ -1125,8 +1170,8 @@ function Ju({ deviceOnly: e = !1 } = {}) {
           }),
         ],
       }),
-          !L && f!=='frontier' && !layout14 && !g && !v && !ornamentPlacement && swElement(SWQuickNav,{state:V,navigate:SWNavigate,current:b?'army':cityOpen?'city':chronicleTab?'chronicle':f}),
-      L && R && z
+          !L && !H && !b && !S && !cityOpen && !ue && !I && !premiumStore && !chronicleTab && !storageOpen && !gemShopOpen && !Me && !Ht && !stonewakeMenuOpen && f!=='frontier' && !layout14 && !g && !v && !ornamentPlacement && swElement(SWQuickNav,{state:V,navigate:SWNavigate,current:b?'army':cityOpen?'city':chronicleTab?'chronicle':f}),
+      L && R
         ? (0, F.jsxs)(`section`, {
             className: `battle-world ${R.rulesVersion === 4 ? `deploy-mode` : ``}`,
             children: [
@@ -1140,11 +1185,12 @@ function Ju({ deviceOnly: e = !1 } = {}) {
                 battleTime: lt,
                 playbackSpeed: dt,
                 enemy: !0,
-                deployment: !navalTool14 && R.rulesVersion === 4 && !St && !B && L.kind!=='defense' && R.saga?.mode!=='hold',
+                deployment: !!z && !simulationError15 && !navalTool14 && R.rulesVersion === 4 && !St && !B && L.kind!=='defense' && R.saga?.mode!=='hold',
                 onDeploy: Sn,
-                selectedTroop:le,reserveCount:R?hl(R)[le]:0,defending:L.kind==='defense'||R.saga?.mode==='hold',
-                navalSupport:R.navalSupport||R.fleet14?.[0],battleInput14:R,navalTool14,onNavalMap14:SWNavalMap14,
+                selectedTroop:le,selectedShip14,reserveCount:R?hl(R)[le]:0,defending:L.kind==='defense'||R.saga?.mode==='hold',
+                navalSupport:R.navalSupport||R.fleet14?.[0],battleInput14:R,navalTool14:simulationError15||!z?null:navalTool14,onNavalMap14:SWNavalMap14,
               }),
+              (!z||simulationError15)&&swElement('div',{className:'sw-simulation-state15',role:simulationError15?'alert':'status',style:{position:'absolute',zIndex:25,top:'40%',left:'50%',transform:'translate(-50%,-50%)',width:'min(360px,85%)',padding:18,border:'1px solid #52798b',borderRadius:12,background:'#102532',color:'#edf4ed',boxShadow:'0 8px 32px #0008',textAlign:'center'}},swElement('strong',null,simulationError15?'Battle paused':'Preparing battlefield…'),swElement('p',null,simulationError15?'Retry to continue from your latest orders.':'Arranging the battlefield and your forces.'),simulationError15&&swElement('button',{className:'primary',onClick:()=>swBattleRuntime.current?.retry()},'Retry simulation'),St&&swElement('button',{className:'secondary',onClick:()=>{En();setChronicleTab('Reports')}},'Exit replay')),
               (0, F.jsxs)(`div`, {
                 className: `battle-title`,
                 children: [
@@ -1199,9 +1245,9 @@ function Ju({ deviceOnly: e = !1 } = {}) {
                 ],
               }),
               kn?.objective && !B && swElement('div',{className:'sw-saga-objective',role:'status'},swElement('span',null,kn.objective.label),swElement('progress',{max:R.campaignType==='sea'?100:1,value:kn.objective.progress,'aria-label':'Mission progress'}),kn.objective.escortHealth!=null&&swElement('small',null,'Escort '+Math.round(kn.objective.escortHealth*100)+'%')),
-              !B && (L.kind==='defense'||R.saga?.mode==='hold') ? swElement('div',{className:'sw-defense-controls'},swElement('strong',null,'Defend the keep'),swElement('span',null,'Your walls and towers fight automatically'),swElement('button',{className:'secondary',onClick:()=>ft(dt===1?2:1)},dt+'× speed'),St&&swElement('button',{className:'secondary',onClick:()=>{En();setChronicleTab('Reports')}},'Exit replay')) : !B && (0, F.jsx)(SWBattleControls, {
+              !B && (L.kind==='defense'||R.saga?.mode==='hold') ? swElement('div',{className:'sw-defense-controls'},swElement('strong',null,'Defend the keep'),swElement('span',null,'Your walls and towers fight automatically'),swElement('button',{className:'secondary',disabled:!z||!!simulationError15,onClick:()=>ft(dt===1?2:1)},dt+'× speed'),St&&swElement('button',{className:'secondary',onClick:()=>{En();setChronicleTab('Reports')}},'Exit replay')) : !B && (0, F.jsx)(SWBattleControls, {
                 input: R, frame: kn, selected: le, onSelect: M, onRetreat: Cn,onExitReplay:()=>{En();setChronicleTab('Reports')},
-                disabled: mt||!!onlineBattleError, replay: St, speed: dt, onSpeed: o==='cloud'&&!St&&L.kind!=='practice'?null:() => ft(e => e === 1 ? 2 : 1),
+                disabled: mt||!!onlineBattleError||!!simulationError15||!z, replay: St, speed: dt, onSpeed: !z||simulationError15||(o==='cloud'&&!St&&L.kind!=='practice')?null:() => ft(e => e === 1 ? 2 : 1),
                 onRally: wn, onAbility: Tn,onShipCommand:SWShipCommand14,selectedShip14,onSelectShip14:setSelectedShip14,navalTool14,onCancelShipCommand:()=>setNavalTool14(null), onNaval: SWFireBroadside, navalHull:kn?.units.find(u=>u.naval),
               }),
               (gt||onlineBattleError) &&
@@ -1246,35 +1292,14 @@ function Ju({ deviceOnly: e = !1 } = {}) {
                         }),
                       ],
                     }),
-                    (0, F.jsx)(Ls, {
-                      value: tt,
-                      onValueChange: nt,
-                      children: (0, F.jsxs)(zs, {
-                        className: `segment-control`,
-                        children: [
-                          (0, F.jsxs)(Bs, {
-                            value: `campaign`,
-                            children: [(0, F.jsx)(j, { size: 16 }), `Land`],
-                          }),
-                          swElement(Bs,{value:'sea'},swElement(xe,{size:16}),'Sea'),
-                          (0, F.jsxs)(Bs, {
-                            value: `provinces`,
-                            children: [
-                              (0, F.jsx)(se, { size: 16 }),
-                              `Provinces`,
-                            ],
-                          }),
-                          (0, F.jsxs)(Bs, {
-                            value: `rivals`,
-                            children: [(0, F.jsx)(De, { size: 16 }), `Rivals`],
-                          }),
-                          (0, F.jsxs)(Bs, {
-                            value: `league`,
-                            children: [(0, F.jsx)(Ee, { size: 16 }), `League`],
-                          }),
-                        ],
-                      }),
-                    }),
+                    swElement('nav',{className:'sw-frontier-nav17','aria-label':'Battle destinations'},
+                      swElement('button',{'aria-pressed':tt==='campaign',onClick:()=>nt('campaign')},swElement(j,{size:17}),'Land campaign'),
+                      swElement('button',{'aria-pressed':tt==='sea',onClick:()=>nt('sea')},swElement(xe,{size:17}),'Sea campaign'),
+                      swElement('select',{'aria-label':'More battle destinations',value:['provinces','rivals','league'].includes(tt)?tt:'more',onChange:event=>{if(event.target.value!=='more')nt(event.target.value)}},
+                        swElement('option',{value:'more',disabled:true},'More'),
+                        swElement('option',{value:'provinces'},'Provinces'),
+                        swElement('option',{value:'rivals'},'Rivals'),
+                        swElement('option',{value:'league'},'League'))),
                   ],
                 }),
                 tt === `campaign` || tt === 'sea'
@@ -1665,7 +1690,7 @@ function Ju({ deviceOnly: e = !1 } = {}) {
                             ? Au()
                               ? `Saved on this iPhone`
                               : `Saved on this device`
-                            : `Device storage unavailable`,
+                            : jt === null ? `Saving…` : `Device storage unavailable`,
                         ],
                       })
                     : o === `error`
@@ -1750,8 +1775,8 @@ function Ju({ deviceOnly: e = !1 } = {}) {
         busy: l,
       }),
       swElement(SWObjectives, {open:stonewakeObjectiveOpen,onClose:()=>{setStonewakeObjectiveOpen(false);try{localStorage.setItem('stonewake-objectives-dismissed','true')}catch{}},state:V,act:mn,busy:l,onFrontier:()=>{setStonewakeObjectiveOpen(false);p('frontier');nt('campaign')},onAction:id=>{setStonewakeObjectiveOpen(false);if(['quarry','barracks','forge'].includes(id))gn(id);else if(id==='army')x(true);else if(id==='age2'){p('capital');h('keep')}else p('frontier')}}),
-      swElement(SWArmy, {open:b,onClose:()=>x(false),state:V,act:mn,busy:l,onFrontier:()=>SWNavigate('frontier'),onCommander:()=>SWNavigate('commander'),onPractice:kind=>{x(false);const army={...wl(),[kind]:Math.min(12,Pl(V))};setBattlePrep14({army,fleet:[]});yn({kind:'practice',defense:Gl(0),practiceKind:kind})}}),
-      swElement(SWScout, {open:!!I,onClose:()=>rt(null),scout:I,state:V,busy:l,navalId,onNavalChange:setNavalId,onPreparation:setBattlePrep14,onAttack:()=>void bn(),onTrain:()=>{scoutReturn14.current=I;navHistory14.current.push('scout');SWNavigate('army')}}),
+      swElement(SWArmy, {open:b,onClose:()=>x(false),state:V,act:mn,busy:l,onFrontier:()=>SWNavigate('frontier'),onCommander:()=>SWNavigate('commander'),onPractice:kind=>{x(false);yn({kind:'practice',defense:Gl(0),practiceKind:kind},'army')}}),
+      swElement(SWScout, {open:!!I,onClose:SWCloseScout16,scout:I,state:V,busy:l,navalId,onNavalChange:setNavalId,onAttack:preparation=>void bn(preparation),onTrain:()=>{scoutReturn14.current=I;SWNavigate('army')},onHarbor:()=>{scoutReturn14.current=I;SWNavigate('fleet')}}),
       (0, F.jsx)(As, {
         open: !!B,
         onOpenChange: (e) => {
@@ -1760,6 +1785,7 @@ function Ju({ deviceOnly: e = !1 } = {}) {
         children:
           !!B &&
           (0, F.jsx)(SWResultContent, {
+            nextActions:SWResultActions17({state:V,battle:B,input:R,replay:St,kind:L?.kind}),onNavigate:SWResultNavigate17,
             defenseReport: B.defenseReport,storesFull:!St&&!B.practice&&!B.defense&&!B.saga&&B.result.won&&!xl.some(k=>B.reward[k]>0),onRepair:()=>{En();SWNavigate('fleet')},objective:B.result.objective||null,seaResult:R?.campaignType==='sea'?B.result:null,earnedGems:B.earnedGems,onRetry:B.saga&&!St&&(!B.result.won||B.trialId)?()=>{const missionId=R.saga.missionId,trialId=R.saga.trialId;En();SWStartAdventure(SWMissionScout(Y(r.current),missionId,trialId))}:null,
             className: `game-dialog result-dialog ${(St && wt ? !B?.result.won : B?.result.won) ? `result-victory` : ``}`,
             showCloseButton: !1,
@@ -1914,7 +1940,7 @@ function Ju({ deviceOnly: e = !1 } = {}) {
               }),
           }),
       }),
-      swElement(SWSettings, {initialTab:settingsSection,onlineMode:o==='cloud',onlineBattle:!!t.activeBattle,onBackup:SWBackupLocal,onRestoreBackup:SWRestoreBackup,onEnterOnline:SWEnterOnline,onReturnLocal:SWReturnLocal,open:ue,onClose:()=>de(false),busy:l,name:Ie,onName:Le,onSaveName:async()=>{await mn({type:'rename',name:Ie},'Kingdom renamed')},sound:Re,onSound:We,volume:ze,onVolume:Ge,onTest:()=>He('complete'),music:stonewakeMusic,onMusic:()=>setStonewakeMusic(!stonewakeMusic),musicVolume,onMusicVolume:setMusicVolume,battleMusicVolume,onBattleMusicVolume:setBattleMusicVolume,reduced:Be,onMotion:Ke,haptics,onHaptics:()=>setHaptics(!haptics),reducedEffects,onReducedEffects:()=>setReducedEffects(!reducedEffects),onGuide:()=>{de(false);Ne(true)}}),
+      swElement(SWSettings, {initialTab:settingsSection,onlineMode:o==='cloud',onlineBattle:!!t.activeBattle,onBackup:SWBackupLocal,onRestoreBackup:SWRestoreBackup,onEnterOnline:SWEnterOnline,onReturnLocal:SWReturnLocal,open:ue,onClose:()=>de(false),busy:l,name:Ie,onName:Le,onSaveName:async()=>{await mn({type:'rename',name:Ie},'Kingdom renamed')},sound:Re,onSound:We,volume:ze,onVolume:Ge,onTest:()=>He('complete'),music:stonewakeMusic,onMusic:()=>setStonewakeMusic(!stonewakeMusic),musicVolume,onMusicVolume:setMusicVolume,battleMusicVolume,onBattleMusicVolume:setBattleMusicVolume,reduced:Be,onMotion:Ke,haptics,onHaptics:()=>setHaptics(!haptics),reducedEffects,onReducedEffects:()=>setReducedEffects(!reducedEffects),onGuide:()=>{SWNavigate('capital');experience15.restart()}}),
       swElement(SWPremiumStore,{open:!!premiumStore,onClose:()=>setPremiumStore(null),state:V,act:mn,busy:l,onlineMode:o==='cloud',onOnlineGame:SWApplyOnlineGame,initialTab:premiumStore?.tab||'Wardrobe',ownedOnly:premiumStore?.owned||false,onPlace:SWPlaceDecoration,onProjects:()=>{setPremiumStore(null);setGemShopOpen(true)}}),
       swElement(SWChronicle,{open:!!chronicleTab,onClose:()=>setChronicleTab(null),initialTab:chronicleTab||'Chapter',state:V,act:mn,busy:l,onStart:SWStartAdventure,onRequirement:SWAdventureRequirement,reports:vt,onReplay:report=>{setChronicleTab(null);On(report)}}),
       swElement(SWCityHub,{onlineMode:o==='cloud',reports:vt,onBuilding:id=>{setCityOpen(false);p('capital');h(id)},open:cityOpen,onClose:()=>setCityOpen(false),state:V,act:mn,busy:l,onBuild:kind=>{setCityOpen(false);gn(kind)},onDefense:SWStartDefense}),
@@ -1963,7 +1989,7 @@ function Ju({ deviceOnly: e = !1 } = {}) {
                         children: [
                           (0, F.jsx)(`h3`, { children: `Raise an army` }),
                           (0, F.jsx)(`p`, {
-                            children: `Complete a barracks and recruit infantry and archers. Upgrade your keep and build a foundry to unlock cavalry and cannons.`,
+                            children: `Train troops through six families in Army. Save a force, then train missing troops together. Research improves their equipment, strength and abilities at levels 3, 6 and 9.`,
                           }),
                         ],
                       }),
@@ -1993,7 +2019,7 @@ function Ju({ deviceOnly: e = !1 } = {}) {
                             children: `Challenge other players`,
                           }),
                           (0, F.jsx)(`p`, {
-                            children: `Build watchtowers and publish your defenses under Rival kingdoms. Players attack saved layouts while their opponents are offline. Use battle reports for revenge and win weekly league cosmetics.`,
+                            children: `Your walls and defenses resist computer raids. Player kingdoms become available when online services are connected. Open Account to see availability. Land and sea campaigns remain available on this device.`,
                           }),
                         ],
                       }),
@@ -2256,3 +2282,5 @@ function Ju({ deviceOnly: e = !1 } = {}) {
     ],
   });
 }
+
+export { Ju };

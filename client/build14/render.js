@@ -1,5 +1,94 @@
+// @ts-nocheck
+// Recovered as an ES module for build 15. Preserve saved-state and replay semantics.
+import { SWDrawSail, SWBannerColors, SWAtlasFrame, SWBuildingPortrait, SWBuildingSize, SWBuildingTile, SWDrawTrebuchet, SWRigColor, SWRigInterpolate, SWRigMesh, SWRigSource, SWTroopTier, Yl, _u, vu } from "../../frontend/legacy/presentation.js";
+import {SWCitizenFrames17} from "../build17/art-metadata.js";
+import {SWVanguardPose17, SWShipDamageArt17} from "../build17/unit-art.js";
+import { SWDrawStructureCollapse15 } from '../build15/combat-presentation.js';
+import { SW13BuildingArt, SW13BuildingCells, SW13ShipArt, SW13SpriteRects, SWLegacySculpted13 } from "../visual13.js";
+import { SWFamily14 } from "./rules.js";
+import { swElement } from "../interface.js";
+import { SWShipPreview14, SWUnitPreview14 } from "./ui.js";
+import { Cc, SWCoast, SWLandStats, SWWalkable, sl } from "../../frontend/core/rules.js";
 // Shared articulated models for menu previews, world actors, ships and casualties.
 const SWRigCache14=new Map();
+// Presentation assets are shared with the world loader. There is one decoded image
+// per source file and no per-unit canvas allocation in the painted path.
+const SWPresentationAssets15={};
+const SWPresentationFiles15={vanguard17:'build17/vanguard-ranks.png',keepRear17:'build17/keep-rear.png',economy17:'build17/economy-buildings.png',citizens17:'build17/citizens.png',keep17:'build17/keep-levels.png',units13:'units-v13.png',unitActions13:'unit-actions-v13.png',workers11:'workers-v11.png',pikes11:'pikes-v11.png',guards11:'guards-v11.png',missiles11:'missiles-v11.png',engines11:'engines-v11.png',ships13:'ships-v13.png',coastalShips15:'build15/coastal-ships.png',naval:'naval.webp',combat:'combat-units.webp',trebuchet:'trebuchet-v1.png'};
+const SWPresentationBudget15=Object.freeze({citizens:15,maskedSpriteTiles:96,rankSpriteTiles:64,maskedSpriteExtent:224,troopFallbackTiles:128,shipFallbackTiles:48,shipSmokePuffs:2,contactShadows:1});
+const SWMaskedSprites15=new Map();
+const SWRankSprites15=new Map();
+const SWRankCloth15=[null,[76,128,148],[47,101,132],[72,133,161],[64,105,120],[76,137,143],[42,94,125],[83,107,139],[105,142,151],[54,91,114]];
+let SWPresentationAssetPromise15;
+function SWLoadPresentationAssets15(){
+ return SWPresentationAssetPromise15||(SWPresentationAssetPromise15=Promise.all(Object.entries(SWPresentationFiles15).map(async([key,file])=>{SWPresentationAssets15[key]=await _u('/art/'+file)})).then(()=>SWPresentationAssets15));
+}
+function SWPresentationImages15(images){
+ if(images)for(const key of Object.keys(SWPresentationFiles15))if(images[key])SWPresentationAssets15[key]=images[key];
+ return SWPresentationAssets15;
+}
+function SWDrawContact15(ctx,x,y,width=7,depth=2.6,alpha=.27){
+ ctx.save();ctx.fillStyle='rgba(37,39,25,'+alpha+')';ctx.beginPath();ctx.ellipse(x,y+.7,width,depth,-.12,0,Math.PI*2);ctx.fill();ctx.restore();
+}
+function SWDrawAtlasPose15(ctx,image,frame,height,referenceHeight,rank){
+ if(!image||!frame)return false;
+ const scale=height/Math.max(1,referenceHeight||frame.h),width=frame.w*scale;
+ if(rank?.level>1){
+  const level=Math.max(1,Math.min(10,rank.level)),key=[image.src,frame.x,frame.y,frame.w,frame.h,rank.kind,level].join(':'),extent=SWPresentationBudget15.maskedSpriteExtent;let tile=SWRankSprites15.get(key);
+  if(!tile){
+   const quality=Math.min(1,extent/Math.max(frame.w,frame.h));tile=document.createElement('canvas');tile.width=Math.min(extent,Math.ceil(frame.w*quality));tile.height=Math.min(extent,Math.ceil(frame.h*quality));const paint=tile.getContext('2d',{willReadFrequently:true});paint.save();paint.scale(quality,quality);if(frame.maskRects){paint.beginPath();for(const rect of frame.maskRects)paint.rect(...rect);paint.clip();}paint.drawImage(image,frame.x,frame.y,frame.w,frame.h,0,0,frame.w,frame.h);paint.restore();
+   const pixels=paint.getImageData(0,0,tile.width,tile.height),data=pixels.data,base=SWRankCloth15[level-1],ranged=['archer','crossbow','scout'].includes(rank.kind),cloth=ranged?[base[1]*.66,base[1]*.88,base[0]*.79]:base;
+   // Re-dye fabric only. Skin, timber, weapons and metal retain their authored
+   // material highlights; the tint follows every walking and attacking pose.
+   for(let i=0;i<data.length;i+=4){const r=data[i],g=data[i+1],b=data[i+2];if(data[i+3]<30||Math.max(r,g,b)-Math.min(r,g,b)<24||!((b>r*1.15&&g>r*1.08)||(g>r*1.22&&g>b*.96)))continue;const light=Math.min(1.7,(r*.21+g*.72+b*.07)/99);for(let channel=0;channel<3;channel++)data[i+channel]=Math.round(data[i+channel]*.22+Math.min(255,cloth[channel]*light)*.78);}
+   paint.putImageData(pixels,0,0);if(SWRankSprites15.size>=SWPresentationBudget15.rankSpriteTiles)SWRankSprites15.delete(SWRankSprites15.keys().next().value);SWRankSprites15.set(key,tile);
+  }
+  ctx.drawImage(tile,-width/2,-frame.h*scale,width,frame.h*scale);return true;
+ }
+ // Clean masked frames once, then reuse a small bitmap. Building hundreds of
+ // clipping rectangles for every citizen on every frame stalls older phones.
+ if(frame.maskRects){
+  const key=[image.src,frame.x,frame.y,frame.w,frame.h].join(':'),extent=SWPresentationBudget15.maskedSpriteExtent;let tile=SWMaskedSprites15.get(key);
+  if(!tile){const quality=Math.min(1,extent/Math.max(frame.w,frame.h));tile=document.createElement('canvas');tile.width=Math.min(extent,Math.ceil(frame.w*quality));tile.height=Math.min(extent,Math.ceil(frame.h*quality));const paint=tile.getContext('2d');paint.scale(quality,quality);paint.beginPath();for(const rect of frame.maskRects)paint.rect(...rect);paint.clip();paint.drawImage(image,frame.x,frame.y,frame.w,frame.h,0,0,frame.w,frame.h);if(SWMaskedSprites15.size>=SWPresentationBudget15.maskedSpriteTiles)SWMaskedSprites15.delete(SWMaskedSprites15.keys().next().value);SWMaskedSprites15.set(key,tile);}
+  ctx.drawImage(tile,-width/2,-frame.h*scale,width,frame.h*scale);
+ }else ctx.drawImage(image,frame.x,frame.y,frame.w,frame.h,-width/2,-frame.h*scale,width,frame.h*scale);
+ return true;
+}
+function SWPaintedTroopPose15(kind,images,state,phase){
+ const attacking=state==='attack',moving=state==='walk',col=attacking?Math.min(3,Math.floor(Math.max(0,Math.min(.999,phase))*4)):moving?Math.floor(((phase*6)%4+4)%4):0;
+ const sculpted=['infantry','archer','healer'].indexOf(kind);
+ if(sculpted>=0&&images.units13){const action=attacking&&images.unitActions13,frames=action?SW13SpriteRects.actions[sculpted]:SW13SpriteRects.units[sculpted];return{image:action?images.unitActions13:images.units13,frame:frames[col],reference:Math.max(...frames.map(f=>f.h))};}
+ const entry={spearman:['pikes11',0],shieldbearer:['guards11',0],scout:['guards11',2],crossbow:['missiles11',0],grenadier:['missiles11',2],knight:['engines11',0],ram:['engines11',2]}[kind];
+ if(entry&&images[entry[0]]){const image=images[entry[0]],row=entry[1]+(attacking?1:0),frames=[0,1,2,3].map(i=>SWAtlasFrame(image,4,4,i,row));return{image,frame:frames[col],reference:Math.max(...frames.map(f=>f.h))};}
+ const row=['infantry','archer','cavalry','cannon'].indexOf(kind);
+ if(row>=0&&images.combat){const image=images.combat,start=attacking?4:0,frames=[0,1,2,3].map(i=>SWAtlasFrame(image,8,4,start+i,row));return{image,frame:frames[col],reference:Math.max(...frames.map(f=>f.h))};}
+ return null;
+}
+function SWDrawPaintedTroop15(ctx,{kind,level=1,x=0,y=0,scale=1,heading=-.8,phase=0,state='idle',enemy=false,images}){
+ const art=SWPresentationImages15(images),siege=['ram','trebuchet','cannon'].includes(kind),mounted=['cavalry','knight'].includes(kind);
+ const pose=SWVanguardPose17(kind,level,art,state,phase)||SWPaintedTroopPose15(kind,art,state,phase),height=pose?.authored17?42:(kind==='trebuchet'?59:mounted?49:siege?42:42)*(1+Math.min(9,level-1)*.007);if(!pose&&!(kind==='trebuchet'&&art.trebuchet))return false;
+ ctx.save();ctx.translate(x,y);ctx.scale(scale,scale);SWDrawContact15(ctx,0,0,siege?16:mounted?12:7,siege?4:2.5);
+ // The authored view faces screen-right. Reflect only across the ground plane.
+ if(Math.cos(heading)-Math.sin(heading)<0)ctx.scale(-1,1);
+ if(state==='death'){const fall=Math.min(1,Math.max(0,phase));ctx.translate(fall*9,fall*2);ctx.rotate(fall*1.32);ctx.scale(1,1-fall*.22);}
+ else if(state==='walk')ctx.translate(0,-Math.abs(Math.sin(phase*Math.PI*3))*.55);
+ else if(state==='idle')ctx.translate(0,-Math.sin(phase*1.8)*.18);
+ if(enemy)ctx.filter='hue-rotate(142deg) saturate(.85)';
+ if(kind==='trebuchet'){
+  ctx.save();ctx.scale(height/78,height/78);SWDrawTrebuchet(ctx,level,phase,state==='walk',state==='attack',Math.max(0,Math.min(1,phase)),art.trebuchet);ctx.restore();
+ }else{
+  if(pose.authored17){
+   // A sword reaching outside the body must not pull the soldier off its tile.
+   ctx.save();ctx.translate((pose.frame.w/2-pose.anchorX)*height/pose.reference,0);
+   SWDrawAtlasPose15(ctx,pose.image,pose.frame,height,pose.reference);ctx.restore();
+  }else{
+   SWTroopTier(ctx,kind,level,height,true);
+   SWDrawAtlasPose15(ctx,pose.image,pose.frame,height,pose.reference,{kind,level});
+   SWTroopTier(ctx,kind,level,height,false);
+  }
+ }
+ ctx.restore();return true;
+}
 function SWHumanoid14(kind,state,phase,level){
  const m=SWRigMesh(),ranged=['archer','crossbow'].includes(kind),medic=kind==='healer',worker=kind==='worker',pike=kind==='spearman',heavy=kind==='shieldbearer',attack=state==='attack',walk=state==='walk',fall=state==='death'?Math.min(1,phase):0;
  const cycle=phase*Math.PI*2,bob=walk?Math.abs(Math.sin(cycle))*.035:Math.sin(cycle)*.009,hip=.68+bob,body=.98+bob,skin=worker?'#bc9270':'skin',cloth=medic?'#ded7b8':worker?'#839172':'cloth',armor=level>=7?'steel':level>=3?'metal':level>=2?'leather':cloth;
@@ -58,9 +147,10 @@ function SWSiegeRig14(kind,state,phase,level){
  if(state==='death')for(const face of m.faces)for(const p of face.points)p[2]*=1-Math.min(1,phase)*.75;
  return m;
 }
-function SWDrawTroopRig14(ctx,{kind='infantry',level=1,x=0,y=0,scale=1,heading=0,phase=0,state='idle',enemy=false}){
+function SWDrawTroopRig14(ctx,{kind='infantry',level=1,x=0,y=0,scale=1,heading=0,phase=0,state='idle',enemy=false,images}){
+ if(kind!=='worker'&&SWDrawPaintedTroop15(ctx,{kind,level,x,y,scale,heading,phase,state,enemy,images}))return;
  const family=SWFamily14(kind)?.id,mounted=family==='riders'&&kind!=='scout',siege=['ram','trebuchet','cannon'].includes(kind),direction=Math.round(heading/(Math.PI/4)),frames=state==='attack'?18:state==='idle'?4:12,normalized=state==='attack'||state==='death'?Math.min(.999,Math.max(0,phase)):((phase*(state==='walk'?1.5:.35))%1+1)%1,index=Math.floor(normalized*frames),key=[kind,level,state,index,direction,enemy].join(':');
- let tile=SWRigCache14.get(key);if(!tile){tile=document.createElement('canvas');tile.width=200;tile.height=190;const mesh=mounted?SWMounted14(kind,state,index/(frames-1),level):siege?SWSiegeRig14(kind,state,index/(frames-1),level):SWHumanoid14(kind,state,index/(frames-1),level);SWRigDraw(tile.getContext('2d'),mesh,{x:100,y:160,scale:siege?66:mounted?69:85,yaw:direction*Math.PI/4,palette:{cloth:enemy?'#bd5347':'#4289ba',skin:'#edb98e',metal:'#8babc0',steel:'#d8e4e8',wood:'#8c5934',woodLight:'#bd8f51',gold:'#eac46c'}});if(SWRigCache14.size>=260)SWRigCache14.delete(SWRigCache14.keys().next().value);SWRigCache14.set(key,tile);}
+ let tile=SWRigCache14.get(key);if(!tile){tile=document.createElement('canvas');tile.width=200;tile.height=190;const mesh=mounted?SWMounted14(kind,state,index/(frames-1),level):siege?SWSiegeRig14(kind,state,index/(frames-1),level):SWHumanoid14(kind,state,index/(frames-1),level);SWRigDraw(tile.getContext('2d'),mesh,{x:100,y:160,scale:siege?66:mounted?69:85,yaw:direction*Math.PI/4,palette:{cloth:enemy?'#bd5347':'#4289ba',skin:'#edb98e',metal:'#8babc0',steel:'#d8e4e8',wood:'#8c5934',woodLight:'#bd8f51',gold:'#eac46c'}});if(SWRigCache14.size>=SWPresentationBudget15.troopFallbackTiles)SWRigCache14.delete(SWRigCache14.keys().next().value);SWRigCache14.set(key,tile);}
  const size=scale*.35;ctx.save();ctx.fillStyle='#192c2948';ctx.beginPath();ctx.ellipse(x,y+2,scale*(siege?14:mounted?10:5),scale*(siege?5:2.3),0,0,Math.PI*2);ctx.fill();ctx.drawImage(tile,x-100*size,y-160*size,200*size,190*size);ctx.restore();
 }
 function lu({kind,level=1}){return swElement(SWUnitPreview14,{kind,level});}
@@ -84,34 +174,85 @@ function SWShipMesh14(kind,level,time,damage=0){
  if(level===10)m.box(0,length*.36,.72,.42,.28,.07,'gold');return m;
 }
 const SWShipCache14=new Map();
+function SWPaintedShipArt15(kind,level,images){
+ const art=SWPresentationImages15(images),sculpted=SW13ShipArt(kind,level,art);
+ if(sculpted)return sculpted;
+ if(kind==='cog'&&art.naval)return{image:art.naval,rect:Yl.naval[1]};
+ return null;
+}
+function SWDrawPaintedShip15(ctx,ship){
+ const {kind,level=1,x=0,y=0,scale=1,heading=0,time=0,side='attack',images}=ship,authored=SWPaintedShipArt15(kind,level,images);if(!authored)return false;
+ const art=SWShipDamageArt17(authored,kind,level,ship.hp,ship.maxHp);
+ const [sx,sy,sw,sh]=art.rect,naturalWidth=(kind==='galley'?83:kind==='cog'?76:kind==='bombard'?79:64)*scale*(1+Math.min(9,level-1)*.009),width=Math.min(naturalWidth,ship.fitHeight?ship.fitHeight*sw/sh:Infinity),height=width*sh/sw,dead=ship.hp!==undefined&&ship.hp<=0,p=dead?Math.max(0,Math.min(1,ship.sinkProgress??1)):0,reduced=ship.reduced===true;
+ ctx.save();ctx.translate(x,y+(reduced?0:Math.sin(time*1.4+level)*.8));ctx.globalAlpha*=1-p;ctx.translate(0,p*height*.43);ctx.rotate(dead?p*.27:reduced?0:Math.sin(time*.7)*.009);
+ // Both ship atlases are authored with the bow toward screen-left.
+ if(Math.cos(heading)-Math.sin(heading)>0)ctx.scale(-1,1);if(side==='defend')ctx.filter='hue-rotate(138deg) saturate(.8)';
+ ctx.drawImage(art.image,sx,sy,sw,sh,-width/2,-height,width,height);ctx.filter='none';
+ const appearance=side==='attack'?(images?.fleetAppearance||images?.appearance):images?.appearance;
+ if(side!=='defend'&&appearance?.sail)SWDrawSail(ctx,0,0,width,SWBannerColors[appearance.sail]||SWBannerColors.linen,time,0,art.image,art.rect);
+ ctx.restore();return true;
+}
 function SWDrawShipRig14(ctx,ship){
+ if(SWDrawPaintedShip15(ctx,ship))return;
  const {kind,level=1,x=0,y=0,scale=1,heading=0,time=0,side='attack'}=ship,damage=ship.hp===undefined?0:1-ship.hp/ship.maxHp,dir=Math.round(heading/(Math.PI/8)),frame=Math.floor(time*8)%16,band=damage>.65?2:damage>.35?1:0,key=[kind,level,dir,frame,band,side].join(':');
- let tile=SWShipCache14.get(key);if(!tile){tile=document.createElement('canvas');tile.width=256;tile.height=230;SWRigDraw(tile.getContext('2d'),SWShipMesh14(kind,level,frame/8,band*.36),{x:128,y:170,scale:55,yaw:dir*Math.PI/8+Math.PI/2,palette:{cloth:side==='defend'?'#a04940':'#317d8b',sail:side==='defend'?'#d7be9d':'#f3e5c3',wood:'#855335',woodLight:'#c49457',metal:'#94afbb',gold:'#e6ba61'}});if(SWShipCache14.size>=100)SWShipCache14.delete(SWShipCache14.keys().next().value);SWShipCache14.set(key,tile);}
+ let tile=SWShipCache14.get(key);if(!tile){tile=document.createElement('canvas');tile.width=256;tile.height=230;SWRigDraw(tile.getContext('2d'),SWShipMesh14(kind,level,frame/8,band*.36),{x:128,y:170,scale:55,yaw:dir*Math.PI/8+Math.PI/2,palette:{cloth:side==='defend'?'#a04940':'#317d8b',sail:side==='defend'?'#d7be9d':'#f3e5c3',wood:'#855335',woodLight:'#c49457',metal:'#94afbb',gold:'#e6ba61'}});if(SWShipCache14.size>=SWPresentationBudget15.shipFallbackTiles)SWShipCache14.delete(SWShipCache14.keys().next().value);SWShipCache14.set(key,tile);}
  ctx.save();ctx.translate(x,y);const sunk=ship.hp<=0,p=sunk?Math.min(1,Math.max(0,time-(ship.sunkAt||time))/3):0;ctx.globalAlpha*=1-p;ctx.translate(0,p*22);ctx.rotate(p*.22);const k=.55*scale;ctx.drawImage(tile,-128*k,-170*k,256*k,230*k);ctx.restore();
 }
 function SWDrawNavalUnit(ctx,ship,images,time,age,reduced){
- const p=vu(ship.x,ship.y);ctx.save();ctx.strokeStyle='#bce7df68';ctx.lineWidth=2;for(let i=0;i<3;i++){ctx.beginPath();ctx.ellipse(p.x,p.y+4+i*2,26+i*7,8+i*3,0,0,Math.PI*2);ctx.stroke();}ctx.restore();
- SWDrawShipRig14(ctx,{...ship,x:p.x,y:p.y,scale:1.10,time:reduced?0:time});
- if(ship.hp>0&&ship.hp<ship.maxHp){ctx.fillStyle='#09252fd9';ctx.fillRect(p.x-22,p.y-79,44,5);ctx.fillStyle=ship.side==='attack'?'#77d3cb':'#e97769';ctx.fillRect(p.x-21,p.y-78,42*ship.hp/ship.maxHp,3);}
- if(ship.hp>0&&ship.hp/ship.maxHp<.45&&!reduced)for(let i=0;i<3;i++){const phase=(time*.6+i/3)%1;ctx.fillStyle='rgba(56,51,43,'+(.26*(1-phase))+')';ctx.beginPath();ctx.ellipse(p.x+Math.sin(i*3)*12+phase*14,p.y-32-phase*45,4+phase*10,5+phase*13,0,0,Math.PI*2);ctx.fill();}
+ const p=vu(ship.x,ship.y),dead=ship.hp<=0,sinkProgress=dead?(reduced?1:Math.min(1,Math.max(0,age)/2300)):0,speed=Math.hypot(ship.vx||0,ship.vy||0),heading=ship.heading||0,dx=Math.cos(heading)-Math.sin(heading),dy=(Math.cos(heading)+Math.sin(heading))*.52,normal=Math.hypot(dx,dy)||1;
+ ctx.save();
+ if(dead&&sinkProgress>=1){ctx.strokeStyle='#8c7752a0';ctx.lineWidth=1.7;for(let i=0;i<3;i++){ctx.beginPath();ctx.moveTo(p.x-12+i*9,p.y+Math.sin(i)*3);ctx.lineTo(p.x-4+i*9,p.y+2+Math.sin(i)*3);ctx.stroke();}ctx.restore();return;}
+ if(speed>.005&&!reduced){for(let i=0;i<3;i++){const distance=12+i*10+(time*9%10),cx=p.x-dx/normal*distance,cy=p.y-dy/normal*distance;ctx.strokeStyle='rgba(209,236,225,'+(.3-i*.07)+')';ctx.lineWidth=1.3;ctx.beginPath();ctx.ellipse(cx,cy,10+i*5,2.3+i*.8,Math.atan2(dy,dx),.2,Math.PI-.2);ctx.stroke();}}
+ ctx.strokeStyle='#d9eee655';ctx.lineWidth=1;ctx.beginPath();ctx.ellipse(p.x,p.y+1,ship.kind==='galley'?34:27,5+sinkProgress*9,-.13,0,Math.PI);ctx.stroke();ctx.restore();
+ SWDrawShipRig14(ctx,{...ship,x:p.x,y:p.y,scale:1.04,time:reduced?0:time,images,sinkProgress,reduced});
+ if(ship.hp>0&&ship.hp<ship.maxHp){ctx.fillStyle='#09252fd9';ctx.fillRect(p.x-22,p.y+8,44,4);ctx.fillStyle=ship.side==='attack'?'#77d3cb':'#e97769';ctx.fillRect(p.x-21,p.y+9,42*ship.hp/ship.maxHp,2);}
+ if(ship.hp>0&&ship.hp/ship.maxHp<.45&&!reduced)for(let i=0;i<SWPresentationBudget15.shipSmokePuffs;i++){const phase=(time*.5+i/2)%1;ctx.fillStyle='rgba(56,51,43,'+(.23*(1-phase))+')';ctx.beginPath();ctx.ellipse(p.x+Math.sin(i*3)*10+phase*8,p.y-25-phase*30,3+phase*7,4+phase*9,0,0,Math.PI*2);ctx.fill();}
 }
 function SWShipPortrait13({kind,level=1}){return swElement(SWShipPreview14,{ship:{kind,level}});}
-function SWDrawPaintedWorker(ctx,person,position,images,time,reduced=false){const point=vu(position.x,position.y);SWDrawTroopRig14(ctx,{kind:'worker',x:point.x,y:point.y,level:1,scale:.60,heading:position.flip?2.3:-.8,state:position.moving?'walk':position.working?'attack':'idle',phase:reduced?0:time+person.id*.13});return true;}
-function SWDrawUnitFall(ctx,event,images,age,reduced=false){const p=vu(event.x,event.y);ctx.save();ctx.globalAlpha=age<1700?1:Math.max(0,1-(age-1700)/700);SWDrawTroopRig14(ctx,{kind:event.unit.kind,level:event.unit.level||1,x:p.x,y:p.y,scale:1,heading:event.flip?2.3:-.8,state:'death',phase:reduced?1:Math.min(1,age/750),enemy:event.enemy});ctx.restore();}
-function SWDrawCollapse(ctx,building,images,point,age,reduced){
- const {width,height}=SWBuildingSize(building),timber=['lumber','farm','cottage','market','builder'].includes(building.kind);SWDrawRubble(ctx,building,point,width);
- if(!reduced&&age<800){const tile=SWBuildingTile(building,images),t=Math.min(1,age/800);ctx.save();ctx.globalAlpha=1-Math.max(0,(t-.7)/.3);ctx.translate(point.x,point.y);ctx.beginPath();ctx.rect(-width*.6,-height*1.1,width*1.2,height*1.2);ctx.clip();
-  // Roof settles first, followed by the supporting walls. The silhouette stays registered.
-  const roofFall=Math.max(0,t-.1)**2*height*.65;ctx.save();ctx.translate(Math.sin(t*28)*(1-t)*1.6,roofFall);ctx.beginPath();ctx.rect(-width,-height*1.2,width*2,height*.65);ctx.clip();ctx.drawImage(tile,-160,-320,320,360);ctx.restore();
-  ctx.save();ctx.translate(0,Math.max(0,t-.25)*height*.35);ctx.scale(1,Math.max(.12,1-Math.max(0,t-.25)*1.2));ctx.beginPath();ctx.rect(-width,-height*.55,width*2,height*.8);ctx.clip();ctx.drawImage(tile,-160,-320,320,360);ctx.restore();ctx.restore();
-  for(let i=0;i<10;i++){const angle=i*2.399,r=(12+t*width*.35)*(i%3+1)/3,up=Math.sin(t*Math.PI)*(8+i%4*3);ctx.fillStyle=timber?(i%2?'#91643e':'#554435'):(i%2?'#b1a78c':'#7c776c');ctx.save();ctx.translate(point.x+Math.cos(angle)*r,point.y+Math.sin(angle)*r*.3-up);ctx.rotate(t*(i%2?1:-1));ctx.fillRect(-3,-2,timber?10:5,timber?2:5);ctx.restore();}
+function SWCitizenPosition(person,time){
+ const route=person.route;if(!route?.length)return null;
+ if(route.length===1)return{...route[0],moving:false,flip:false,working:true,heading:-.8,workPhase:((time*.65+person.id*.13)%1+1)%1};
+ // Walk by distance, not by point index, so short turns do not produce a speed jump.
+ const lengths=route.slice(1).map((p,i)=>Math.hypot(p.x-route[i].x,p.y-route[i].y)),distance=lengths.reduce((sum,v)=>sum+v,0),travel=Math.max(5,distance/.42),pause=3.2+(person.id%3),cycle=travel*2+pause*2,phase=((time+person.id*2.17)%cycle+cycle)%cycle;
+ const outward=phase<travel,returning=phase>=travel+pause&&phase<travel*2+pause,moving=outward||returning,working=phase>=travel&&phase<travel+pause;
+ const fraction=outward?phase/travel:returning?1-(phase-travel-pause)/travel:working?1:0;
+ let remaining=Math.min(distance-.00001,Math.max(0,fraction*distance)),index=0;while(index<lengths.length-1&&remaining>lengths[index]){remaining-=lengths[index];index++;}
+ const a=route[index],b=route[index+1],mix=lengths[index]>0?remaining/lengths[index]:0,direction=returning?-1:1,dx=(b.x-a.x)*direction,dy=(b.y-a.y)*direction,heading=Math.atan2(dy,dx);
+ return{x:a.x+(b.x-a.x)*mix+(person.id%3-1)*.13,y:a.y+(b.y-a.y)*mix+(person.id%2-.5)*.12,moving,working,flip:dx-dy<0,heading,workPhase:((time*.65+person.id*.13)%1+1)%1};
+}
+function SWDrawPaintedWorker(ctx,person,position,images,time,reduced=false){
+ const art=SWPresentationImages15(images),point=vu(position.x,position.y),role=person.role||'',working=!!position.working,carrier=['Merchant','Trader','Stonemason','Builder'].includes(role)||person.sprite===3||person.sprite===2;
+ const phase=reduced?0:time+(person.id||0)*.17,walkColumn=position.moving&&!reduced?Math.floor(((phase*5.5)%4+4)%4):0,workPhase=reduced?0:position.workPhase??((phase*.65)%1+1)%1;
+ ctx.save();ctx.translate(point.x,point.y);SWDrawContact15(ctx,0,0,5.8,2.15,.24);if(position.flip)ctx.scale(-1,1);
+ if(art.citizens17){
+  const worker=role==='Smith'||role==='Stonemason'||role==='Builder'||person.sprite===4?2:carrier?1:0;
+  const row=worker*2+(working?1:0),frames=SWCitizenFrames17[row],standing=SWCitizenFrames17[worker*2];
+  const column=working&&!reduced?Math.min(3,Math.floor(workPhase*4)):walkColumn,frame=frames[column],reference=Math.max(...standing.map(f=>f.h));
+  const height=30.5,scale=height/reference;
+  ctx.drawImage(art.citizens17,frame.x,frame.y,frame.w,frame.h,-frame.w*scale/2,-frame.h*scale,frame.w*scale,frame.h*scale);
+  ctx.restore();return true;
  }
- if(!reduced)SWDrawDust(ctx,point,width,height,age);
+ // The carry pose already holds its crate with both hands. The load and arms stay
+ // together through the walk cycle instead of a fixed crate over swinging arms.
+ if((carrier||!art.workers11)&&art.units13){
+  const frames=SW13SpriteRects.units[3],frame=frames[walkColumn],settle=working&&!reduced?Math.sin(workPhase*Math.PI*2)*.22:0;ctx.translate(0,settle);
+  SWDrawAtlasPose15(ctx,art.units13,frame,31,Math.max(...frames.map(f=>f.h)));ctx.restore();return true;
+ }
+ if(art.workers11){
+  const job=role==='Smith'||person.sprite===4?2:role==='Woodcutter'||person.sprite===1?1:0,row=job*2+(working?1:0),column=working&&!reduced?Math.min(3,Math.floor(workPhase*4)):walkColumn,frames=[0,1,2,3].map(i=>SWAtlasFrame(art.workers11,4,6,i,row)),standing=[0,1,2,3].map(i=>SWAtlasFrame(art.workers11,4,6,i,job*2)),reference=Math.max(...standing.map(f=>f.h));
+  SWDrawAtlasPose15(ctx,art.workers11,frames[column],31,reference);ctx.restore();return true;
+ }
+ ctx.restore();return false;
+}
+function SWDrawUnitFall(ctx,event,images,age,reduced=false){const p=vu(event.x,event.y);ctx.save();ctx.globalAlpha=age<1700?1:Math.max(0,1-(age-1700)/700);SWDrawTroopRig14(ctx,{kind:event.unit.kind,level:event.unit.level||1,x:p.x,y:p.y,scale:1,heading:event.flip?2.3:-.8,state:'death',phase:reduced?1:Math.min(1,age/750),enemy:event.enemy,images});ctx.restore();}
+function SWDrawCollapse(ctx,building,images,point,age,reduced){
+ SWDrawStructureCollapse15(ctx,building,images,point,age,reduced);
 }
 function SWDrawSculptedBuilding13(ctx,building,images,point,width){
  const art=SW13BuildingArt(building,images);if(!art)return false;const lv=Math.max(1,Math.min(10,building.level||1)),milestone=Math.floor((lv-1)/3),growth=(lv-1)%3;
  // Keep the authored main building, then add fitted, level-specific working structures.
- SWLegacySculpted13(ctx,building,images,point,width*(SW13BuildingCells[building.kind]?1:.84+lv*.015));
+ SWLegacySculpted13(ctx,building,images,point,width*(art.authored17||SW13BuildingCells[building.kind]?1:.84+lv*.015));
+ if(art.authored17)return true;
  if(lv<=1)return true;const m=SWRigMesh(),stone=['keep','quarry','tower','forge','bastion','well'].includes(building.kind),wood=['lumber','farm','storehouse','workshop','market'].includes(building.kind),unit=width/95;
  for(let i=0;i<Math.min(3,Math.floor(lv/2));i++){const x=(i%2?1:-1)*.48,y=.35+Math.floor(i/2)*.24;m.box(x,y,0,.24,.24,.15+(wood?lv*.013:0),stone?'stone':'wood');if(wood)m.box(x,y,.16,.23,.23,.03,'woodLight');}
  if(growth>=1||lv>=7){for(const side of[-1,1])m.limb([side*.58,.05,0],[side*.58,.05,.31+milestone*.06],.035,stone?'stoneDark':'wood');m.limb([-.58,.05,.32],[.58,.05,.32],.03,stone?'stone':'woodLight');}
@@ -160,3 +301,5 @@ function SWRigDraw(ctx,mesh,{x=0,y=0,scale=50,yaw=0,palette={},alpha=1,tilt=0}={
   const projected=mesh.faces.map(f=>{const p=f.points.map(project),a=f.points[0],b=f.points[1],c=f.points[2],u=b.map((v,i)=>v-a[i]),v=c.map((value,i)=>value-a[i]),n=[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]],len=Math.hypot(...n)||1,nx=n[0]*ca-n[1]*sa,ny=n[0]*sa+n[1]*ca,diffuse=Math.max(0,(nx*light[0]+ny*light[1]+n[2]*light[2])/len),shade=(.66+diffuse*.51)*f.shade;return {p,depth:p.reduce((s,v)=>s+v[2],0)/p.length,color:SWRigColor(colors[f.material]||f.material,shade)};}).sort((a,b)=>a.depth-b.depth);
   ctx.save();ctx.globalAlpha*=alpha;ctx.lineJoin='round';for(const f of projected){ctx.beginPath();f.p.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.closePath();ctx.fillStyle=f.color;ctx.fill();ctx.strokeStyle=f.color;ctx.lineWidth=.35;ctx.stroke();}ctx.restore();
 }
+
+export { SWRigCache14, SWPresentationAssets15, SWPresentationFiles15, SWPresentationBudget15, SWMaskedSprites15, SWRankSprites15, SWRankCloth15, SWPresentationAssetPromise15, SWLoadPresentationAssets15, SWPresentationImages15, SWDrawContact15, SWDrawAtlasPose15, SWPaintedTroopPose15, SWDrawPaintedTroop15, SWHumanoid14, SWMounted14, SWSiegeRig14, SWDrawTroopRig14, lu, SWShipMesh14, SWShipCache14, SWPaintedShipArt15, SWDrawPaintedShip15, SWDrawShipRig14, SWDrawNavalUnit, SWShipPortrait13, SWCitizenPosition, SWDrawPaintedWorker, SWDrawUnitFall, SWDrawCollapse, SWDrawSculptedBuilding13, SWBuildingPortrait13, SWSeaTexture14, SWSeaGroundTexture14, SWDrawSeaGround14, SWDrawLandingEdge14, SWDrawSea14, SWDrawLayoutOverlay14, SWRigDraw };

@@ -1,0 +1,24 @@
+{
+  "name": "stonewake-client",
+  "version": "1.0.18",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.13"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "check": "node scripts/check-modules.mjs && tsc --noEmit && eslint frontend/runtime frontend/test scripts/build.mjs scripts/check-modules.mjs",
+    "test": "node --test frontend/test/*.test.mjs",
+    "release:check": "node scripts/release-check.mjs",
+    "verify": "npm run build && npm run check && npm test"
+  },
+  "devDependencies": {
+    "acorn": "8.18.0",
+    "esbuild": "0.28.1",
+    "eslint": "10.11.0",
+    "eslint-scope": "9.1.2",
+    "globals": "16.5.0",
+    "typescript": "5.9.3"
+  }
+}

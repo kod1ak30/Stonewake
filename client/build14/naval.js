@@ -1,3 +1,7 @@
+// @ts-nocheck
+// Recovered as an ES module for build 15. Preserve saved-state and replay semantics.
+import { Gc, Hl, J, Kc, Ll, Ml, Nl, Pl, SWAppearance, SWLegacyFu13, SWLegacyNavalStep13, Wc, cl, hl, ll, ml, pl, wl } from "../../frontend/core/rules.js";
+import { SWFamilies14, SWFamily14, SWLoadout14, SWSelectedArmy14 } from "./rules.js";
 // Two campaigns share combat, while sea assaults require a real transport manifest.
 const SWShipRoles14=Object.freeze({
  cutter:{name:'Coastal cutter',role:'Fast landing craft',capacity:12,growth:3,hp:440,damage:12,range:2.6,speed:.85,cooldown:2.8},
@@ -21,13 +25,101 @@ function SWShipCapacity14(ship){const d=SWShipRoles14[ship.kind];return d?d.capa
 function SWTroopWeight14(kind){return {hero:0,infantry:1,archer:1,spearman:1,shieldbearer:2,scout:1,crossbow:2,cavalry:3,knight:4,ram:4,trebuchet:5,cannon:5,grenadier:2,healer:2}[kind]??1;}
 function SWReadyFleet14(state){return (state.fleet||[]).filter(s=>SWShipRoles14[s.kind]&&s.level>0&&!s.readyAt&&!s.voyage&&!s.combatBattleId&&!s.wrecked&&!s.repairReadyAt);}
 function SWFleetLimit14(state){return Ml(state)>=7?3:2;}
-function SWPackCargo14(state,ids,army){
- const ready=SWReadyFleet14(state),fleet=ids.slice(0,SWFleetLimit14(state)).map(id=>ready.find(s=>s.id===id)).filter(Boolean).map(s=>({id:s.id,kind:s.kind,level:s.level,cargo:{},capacity:SWShipCapacity14(s)}));
- const remaining={...army};for(const kind of Object.keys(army).filter(k=>army[k]>0).sort((a,b)=>SWTroopWeight14(b)-SWTroopWeight14(a))){for(let i=0;i<army[kind];i++){
-  const weight=SWTroopWeight14(kind),ship=fleet.filter(s=>s.capacity-Object.entries(s.cargo).reduce((a,[k,n])=>a+SWTroopWeight14(k)*n,0)>=weight).sort((a,b)=>(a.kind==='cog'?-1:0)-(b.kind==='cog'?-1:0))[0];
-  if(!ship)break;ship.cargo[kind]=(ship.cargo[kind]||0)+1;remaining[kind]--;
- }}
- return {fleet,remaining,army:Object.fromEntries(Object.keys(J).map(k=>[k,(army[k]||0)-(remaining[k]||0)])),capacity:fleet.reduce((n,s)=>n+s.capacity,0),weight:Object.entries(army).reduce((n,[k,v])=>n+v*SWTroopWeight14(k),0)};
+// Preparation is a suggestion, never a mutation or a replacement for validation.
+function SWCargoWeight14(army){return Object.entries(army).reduce((sum,[kind,count])=>sum+SWTroopWeight14(kind)*count,0);}
+function SWPreparationArmy14(state,requested=SWSelectedArmy14(state)){
+ const available=wl(),preferred=SWLoadout14(state).slots,keep=Ml(state);
+ for(const kind of Object.keys(J)){
+  const count=requested?.[kind],owned=state.army?.[kind];
+  if(Number.isFinite(count)&&Number.isFinite(owned)&&(J[kind].unlock||1)<=keep)available[kind]=Math.max(0,Math.min(80,Math.floor(count),Math.floor(owned)));
+ }
+ // Keep the active doctrine when an old or malformed force includes variants.
+ const kinds=SWFamilies14.map(family=>family.kinds.filter(kind=>available[kind]>0).sort((a,b)=>Number(preferred.includes(b))-Number(preferred.includes(a))||available[b]-available[a]||family.kinds.indexOf(a)-family.kinds.indexOf(b))[0]).filter(Boolean);
+ const army=wl();let room=Pl(state);
+ while(room>0){let added=false;for(const kind of kinds){if(room>0&&army[kind]<available[kind]){army[kind]++;room--;added=true;}}if(!added)break;}
+ return army;
+}
+function SWPreparationShips14(state,ids){
+ const ready=SWReadyFleet14(state),seen=new Set(),ships=[];
+ for(const id of Array.isArray(ids)?ids:[]){
+  const ship=ready.find(candidate=>candidate.id===id);
+  if(!ship||seen.has(id))continue;
+  seen.add(id);ships.push(ship);if(ships.length===SWFleetLimit14(state))break;
+ }
+ return ships;
+}
+function SWCargoManifest14(ships,army){
+ const fleet=ships.map(ship=>({id:ship.id,kind:ship.kind,level:ship.level,cargo:{},capacity:SWShipCapacity14(ship)}));
+ const troops=Object.keys(J).flatMap(kind=>Array(army[kind]||0).fill(kind)).sort((a,b)=>SWTroopWeight14(b)-SWTroopWeight14(a));
+ const room=fleet.map(ship=>ship.capacity),suffix=Array(troops.length+1).fill(0),divisor=Array(troops.length+1).fill(0),failed=new Set();
+ function gcd(a,b){while(b){const remainder=a%b;a=b;b=remainder;}return a;}
+ for(let index=troops.length-1;index>=0;index--){const weight=SWTroopWeight14(troops[index]);suffix[index]=suffix[index+1]+weight;divisor[index]=gcd(weight,divisor[index+1]);}
+ // Repack after adding a troop. This prevents light troops from fragmenting
+ // the holds and rejecting a heavy unit that would fit after rearrangement.
+ function place(index){
+  if(index===troops.length)return true;
+  if(suffix[index]>room.reduce((sum,value)=>sum+value,0))return false;
+  // Space left over modulo every remaining troop's weight cannot be shared
+  // across holds. Reject these impossible branches before searching them.
+  const unit=divisor[index];if(unit>1&&suffix[index]>room.reduce((sum,value)=>sum+Math.floor(value/unit)*unit,0))return false;
+  const key=index+':'+[...room].sort((a,b)=>a-b).join(',');if(failed.has(key))return false;
+  const kind=troops[index],weight=SWTroopWeight14(kind),tried=new Set();
+  const candidates=room.map((space,ship)=>({space,ship,role:['cog','cutter'].includes(fleet[ship].kind)?0:1})).filter(slot=>slot.space>=weight).sort((a,b)=>a.role-b.role||a.space-b.space||a.ship-b.ship);
+  for(const slot of candidates){
+   if(tried.has(slot.space))continue;tried.add(slot.space);room[slot.ship]-=weight;
+   if(place(index+1)){fleet[slot.ship].cargo[kind]=(fleet[slot.ship].cargo[kind]||0)+1;return true;}
+   room[slot.ship]+=weight;
+  }
+  failed.add(key);return false;
+ }
+ return place(0)?fleet:null;
+}
+function SWPackCargo14(state,ids,army=SWSelectedArmy14(state)){
+ const requestedArmy=SWPreparationArmy14(state,army),ships=SWPreparationShips14(state,ids),capacity=ships.reduce((sum,ship)=>sum+SWShipCapacity14(ship),0),loaded=wl();
+ const kinds=Object.keys(J).filter(kind=>requestedArmy[kind]>0),core=kinds.filter(kind=>['vanguard','rangers'].includes(SWFamily14(kind).id));
+ const specialists=kinds.filter(kind=>!core.includes(kind)).sort((a,b)=>SWTroopWeight14(b)-SWTroopWeight14(a));
+ const complete=SWCargoManifest14(ships,requestedArmy);
+ let fleet=complete||SWCargoManifest14(ships,loaded),coreWeight=0;
+ if(complete)Object.assign(loaded,requestedArmy);
+ function add(kind){
+  if(loaded[kind]>=requestedArmy[kind])return false;
+  const candidate={...loaded,[kind]:loaded[kind]+1},manifest=SWCargoManifest14(ships,candidate);
+  if(!manifest)return false;loaded[kind]++;fleet=manifest;return true;
+ }
+ // Reserve most of a small landing for the requested frontline and ranged
+ // units, in their existing proportions, before adding heavy specialists.
+ if(!complete&&capacity>0){
+  const reserve=Math.min(Math.ceil(capacity*.6),core.reduce((sum,kind)=>sum+requestedArmy[kind]*SWTroopWeight14(kind),0));
+  while(coreWeight<reserve){
+   const next=[...core].sort((a,b)=>loaded[a]/requestedArmy[a]-loaded[b]/requestedArmy[b]).find(kind=>add(kind));
+   if(!next)break;coreWeight+=SWTroopWeight14(next);
+  }
+  while(true){let added=false;for(const kind of [...specialists,...core])if(add(kind))added=true;if(!added)break;}
+ }
+ const remaining=Object.fromEntries(Object.keys(J).map(kind=>[kind,requestedArmy[kind]-loaded[kind]]));
+ return {fleet,ids:fleet.map(ship=>ship.id),remaining,army:loaded,requestedArmy,capacity,weight:SWCargoWeight14(loaded),requestedWeight:SWCargoWeight14(requestedArmy),troopCount:Nl(loaded),excludedCount:Nl(remaining)};
+}
+function SWRecommendFleet14(state,army=SWSelectedArmy14(state)){
+ const requested=SWPreparationArmy14(state,army);if(!Nl(requested))return [];
+ const seen=new Set(),ready=SWReadyFleet14(state).filter(ship=>{if(seen.has(ship.id))return false;seen.add(ship.id);return true;}).sort((a,b)=>String(a.id).localeCompare(String(b.id)));
+ let best=null;
+ function consider(ships,start){
+  if(ships.length){
+   const pack=SWPackCargo14(state,ships.map(ship=>ship.id),requested),mix=ships.some(ship=>['cutter','cog'].includes(ship.kind))&&ships.some(ship=>['galley','bombard'].includes(ship.kind));
+   const escortCargo=pack.fleet.filter(ship=>['galley','bombard'].includes(ship.kind)).reduce((sum,ship)=>sum+SWCargoWeight14(ship.cargo),0);
+   const score=[Number(!pack.excludedCount),pack.troopCount,pack.weight,Number(mix),-ships.length,-escortCargo,ships.reduce((sum,ship)=>sum+SWShipRoles14[ship.kind].damage*(1+.13*(ship.level-1)),0),-pack.capacity];
+   const better=!best||score.some((value,index)=>value!==best.score[index]&&score.slice(0,index).every((before,i)=>before===best.score[i])&&value>best.score[index]);
+   if(better)best={ids:pack.ids,score};
+  }
+  if(ships.length===SWFleetLimit14(state))return;
+  for(let index=start;index<ready.length;index++)consider([...ships,ready[index]],index+1);
+ }
+ consider([],0);return best?.ids||[];
+}
+function SWRecommendSeaPreparation14(state,army=SWSelectedArmy14(state),ids){
+ const pack=SWPackCargo14(state,ids===undefined?SWRecommendFleet14(state,army):ids,army);
+ const reason=!pack.fleet.length?'Choose a ready ship in the Harbor.':pack.troopCount<3?'At least three available troops must fit aboard.':null;
+ return {...pack,canSail:!reason,reason};
 }
 function SWValidateCargo14(state,rawFleet,army){
  if(!Array.isArray(rawFleet)||!rawFleet.length||rawFleet.length>SWFleetLimit14(state))throw Error('Choose up to '+SWFleetLimit14(state)+' ready ships.');
@@ -41,10 +133,11 @@ function SWValidateCargo14(state,rawFleet,army){
 }
 function SWSeaDefense14(index){
  const chapter=SWSeaChapters14[index];if(!chapter)throw Error('Choose a sea campaign.');
- const level=Math.min(10,Math.max(1,index)),defense=cl(Math.max(0,index-1),chapter.name,level);
+ const level=Math.min(10,Math.max(1,index)),defense=cl(Math.max(0,index-1),chapter.name,level,{sea:true,chapter:index});
  defense.coast14=true;defense.seaMode=chapter.mode;
  defense.buildings=defense.buildings.map(b=>({...b,level:['keep','wall','gate'].includes(b.kind)?Math.max(1,level):Math.max(1,Math.ceil(level*.7))}));
  if(index===0)defense.buildings=defense.buildings.filter(b=>!['tower','mortar','bastion'].includes(b.kind)||b.x===6);
+ defense.buildings=defense.buildings.filter(b=>b.x!==0||b.y!==6);
  defense.buildings.push({id:'sea-harbor',kind:'harbor',x:0,y:6,level:Math.max(1,chapter.keep)});
  defense.buildings=defense.buildings.filter((b,i,all)=>!all.slice(0,i).some(p=>p.x===b.x&&p.y===b.y));
  if(index>=2){defense.buildings=defense.buildings.filter(b=>b.x!==0||b.y!==2);defense.buildings.push({id:'shore-battery',kind:'tower',specialty:'ballista',x:0,y:2,level:Math.max(1,chapter.keep-1)});}
@@ -163,3 +256,5 @@ function Fu(state,kind,index,input,result,ranked=true,now=Date.now()){
  if(input.commander)Kc(state,input.commander.id,first?50:15);
  return Ll(state,first?chapter.reward:{gold:35,wood:30,stone:15,food:20});
 }
+
+export { SWShipRoles14, SWSeaChapters14, SWShipCapacity14, SWTroopWeight14, SWReadyFleet14, SWFleetLimit14, SWPreparationArmy14, SWPackCargo14, SWRecommendFleet14, SWRecommendSeaPreparation14, SWValidateCargo14, SWSeaDefense14, SWSeaNavy14, SWSeaLanding14, SWCanDeploy14, SWDeploymentOrder14, SWOrders14, SWCreateBattle14, SWCreateShip14, SWFleetUnits14, SWSeaEnemyUnits14, SWValidateShipOrders14, SWSeaStep14, SWNavalStep, SWSeaObjective14, Fu };

@@ -1,0 +1,70 @@
+{
+  "source": "Physical iPhone Build 17 touch check, 20 September 2026",
+  "samples": [
+    {
+      "at": 1789930411774,
+      "metrics": {
+        "tapClicks": 12,
+        "tapRepeated": 9,
+        "tapMissingClicks": 10,
+        "mainLagMaxMs": 3,
+        "tapCancelled": 0,
+        "tapReleases": 22,
+        "tapDowns": 26,
+        "sampleSeconds": 30.24,
+        "inputDelayP95Ms": 27,
+        "tapDetached": 0,
+        "inputDelayMaxMs": 31,
+        "tapMoved": 4
+      },
+      "event": "input_sample"
+    },
+    {
+      "metrics": {
+        "inputDelayP95Ms": 27,
+        "tapDowns": 62,
+        "tapRepeated": 37,
+        "mainLagMaxMs": 292,
+        "tapReleases": 56,
+        "tapClicks": 19,
+        "tapCancelled": 0,
+        "tapMoved": 6,
+        "inputDelayMaxMs": 30,
+        "tapMissingClicks": 35,
+        "sampleSeconds": 30.04,
+        "tapDetached": 2
+      },
+      "event": "input_sample",
+      "at": 1789930441812
+    },
+    {
+      "event": "input_sample",
+      "at": 1789930469140,
+      "metrics": {
+        "tapClicks": 13,
+        "tapRepeated": 23,
+        "tapMissingClicks": 18,
+        "mainLagMaxMs": 58,
+        "tapCancelled": 0,
+        "tapReleases": 32,
+        "tapDowns": 47,
+        "sampleSeconds": 27.33,
+        "inputDelayP95Ms": 27,
+        "tapDetached": 1,
+        "inputDelayMaxMs": 29,
+        "tapMoved": 15
+      }
+    }
+  ],
+  "totals": {
+    "tapDowns": 135,
+    "tapReleases": 110,
+    "tapClicks": 44,
+    "tapMissingClicks": 63,
+    "tapDetached": 3,
+    "tapCancelled": 0,
+    "tapMoved": 25,
+    "tapRepeated": 69,
+    "sampleSeconds": 87.61
+  }
+}
