@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "projection": { "azimuth": 0.7853981634, "elevation": 0.5235987756, "light": [-0.5, -0.6, 0.8] },
+  "palette": { "stone": "#b6aa8b", "stoneDark": "#877c68", "metal": "#8997a0", "steel": "#bcc6c8", "gold": "#c7aa66", "wood": "#765239", "woodLight": "#aa8055", "cloth": "#375c77", "skin": "#c39a77", "leather": "#4e4035", "sail": "#dbd0ae", "shadow": "#263329" },
+  "soldier": {
+    "height": 1.84, "hipHeight": 0.84, "hipWidth": 0.16, "shoulderHeight": 1.35, "shoulderWidth": 0.26,
+    "upperLeg": 0.38, "lowerLeg": 0.38, "upperArm": 0.30, "lowerArm": 0.28, "headRadius": 0.15,
+    "states": {
+      "idle": { "duration": 2.8, "loop": true, "frames": 12 },
+      "walk": { "duration": 0.8, "loop": true, "frames": 12, "stride": 0.55 },
+      "work": { "duration": 1.2, "loop": true, "frames": 12 },
+      "attack": { "duration": 0.72, "loop": false, "frames": 12, "keys": [[0, -0.3], [0.27, -2.1], [0.46, 0.95], [0.72, 0.2], [1, -0.3]], "contact": 0.46 },
+      "stagger": { "duration": 0.36, "loop": false, "frames": 8 },
+      "death": { "duration": 0.85, "loop": false, "frames": 12 }
+    }
+  },
+  "ship": { "length": 3.2, "beam": 0.95, "keelDepth": 0.35, "deckHeight": 0.3, "mastHeight": 2.25, "sailWidth": 1.45, "sailHeight": 1.42, "segments": 12 },
+  "lighthouse": { "height": 3.1, "baseRadius": 0.70, "topRadius": 0.43, "courses": 11, "segments": 16, "lanternHeight": 0.58, "stages": [0.30, 0.68, 1] },
+  "export": { "directions": 8, "soldierCell": [128, 144], "shipCell": [256, 240], "buildingCell": [256, 320], "alpha": true, "maxLevel": 10 }
+}

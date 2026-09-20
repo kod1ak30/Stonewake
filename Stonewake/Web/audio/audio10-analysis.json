@@ -1,0 +1,60 @@
+{
+  "composition": {
+    "bpm": 100,
+    "bars": 20,
+    "meter": "4/4",
+    "key": "D minor, dominant A major",
+    "duration_seconds": 48,
+    "seed": 100319
+  },
+  "battle.m4a": {
+    "integrated_lufs": -22.1,
+    "true_peak_dbfs": -6.5
+  },
+  "loop": {
+    "decoded_frames": 2116800,
+    "expected_frames": 2116800,
+    "boundary_step": 0.00738525390625,
+    "normal_99_9_percentile_step": 0.0367431640625,
+    "sample_peak": 0.47509765625,
+    "head_tail_rms_ratio": 3.6508473079888897,
+    "clipped_samples": 0
+  },
+  "effects": {
+    "naval-fire.wav": {
+      "duration_seconds": 1.2,
+      "sample_peak_dbfs": -5.500510037522204,
+      "clipped_samples": 0,
+      "first_sample": 0.0,
+      "last_sample": 0.0
+    },
+    "naval-impact.wav": {
+      "duration_seconds": 1.5,
+      "sample_peak_dbfs": -5.500510037522204,
+      "clipped_samples": 0,
+      "first_sample": 0.0,
+      "last_sample": 0.0
+    },
+    "building-destroy.wav": {
+      "duration_seconds": 1.9,
+      "sample_peak_dbfs": -5.500510037522204,
+      "clipped_samples": 0,
+      "first_sample": 0.0,
+      "last_sample": 0.0
+    },
+    "wood-break.wav": {
+      "duration_seconds": 0.85,
+      "sample_peak_dbfs": -7.0005506829029605,
+      "clipped_samples": 0,
+      "first_sample": 0.0,
+      "last_sample": 0.0
+    },
+    "water-splash.wav": {
+      "duration_seconds": 1.4,
+      "sample_peak_dbfs": -7.0005506829029605,
+      "clipped_samples": 0,
+      "first_sample": 0.0,
+      "last_sample": 0.0
+    }
+  }
+}

@@ -1,0 +1,125 @@
+{
+  "audit_date": "2026-09-19",
+  "baseline": "Build 13",
+  "physical_device_actions": "Read-only save copy; no install, mutation or launch",
+  "simulator_restoration": "Original save restored and compared byte for byte",
+  "browser_sizes": [
+    [
+      932,
+      430
+    ],
+    [
+      844,
+      390
+    ],
+    [
+      430,
+      932
+    ]
+  ],
+  "screenshots": [
+    {
+      "file": "screenshots/01-home-native.png",
+      "sha256": "fbb17fef94c3993e8e2229a56bf573768eab254ff8b0582f02f3b7ca26a45442"
+    },
+    {
+      "file": "screenshots/02-home-web.png",
+      "sha256": "8da270a4b4dbadceca3385ed265a0cf72b65520c0232c2e3d51ad40cce0ae76d"
+    },
+    {
+      "file": "screenshots/03-menu-landscape.png",
+      "sha256": "d545d15d03992d62d613e55111d3f9c8967f1709ada71321338339da1c6beb5d"
+    },
+    {
+      "file": "screenshots/04-storage-landscape.png",
+      "sha256": "79c3ddd121350342c61a310ac8710a489f6ac9f7bde86c0752b907a7665d087e"
+    },
+    {
+      "file": "screenshots/05-storehouse-landscape.png",
+      "sha256": "792e5264ad22c39dd3b7376f362232b9c9334bee6884741fa90e2affd5ba8669"
+    },
+    {
+      "file": "screenshots/06-keep-landscape.png",
+      "sha256": "988884fbe0deece835ea7e5a5c622f6d627927d9029c26efb8bc0dd79f7aaecf"
+    },
+    {
+      "file": "screenshots/07-keep-level-preview.png",
+      "sha256": "30771a63fe2eea8a396ef8c003838c1b156bc34ab43ba832fa58c68d1e2ba31a"
+    },
+    {
+      "file": "screenshots/08-army-landscape.png",
+      "sha256": "5d964e843088db8bdd42eb5a74f311e323bfa6aa91724598642c2e5c9de22b90"
+    },
+    {
+      "file": "screenshots/09-research-landscape.png",
+      "sha256": "5bb975680dc37fd9d2327785be58734ce486134c859264966f099822e1c4af50"
+    },
+    {
+      "file": "screenshots/10-research-short-landscape.png",
+      "sha256": "771878dd563c3cda8e5611c822616aacd25f63f4ef14870e677884bf6100d694"
+    },
+    {
+      "file": "screenshots/11-research-portrait.png",
+      "sha256": "f9ba14d4f4076d6e3cab3d29926e3e0e4025e231701be263dd20ea6a0507519e"
+    },
+    {
+      "file": "screenshots/12-frontier-landscape.png",
+      "sha256": "76ae629af24f1117dbe6f022dbdefc13362647d996efb2be33396b2abcfdc1c6"
+    },
+    {
+      "file": "screenshots/13-scout-landscape.png",
+      "sha256": "46cc51fe4036747f8ea9d6e99f19d1d189423c3cd79694fef5cd34cb797a3579"
+    },
+    {
+      "file": "screenshots/14-battle-start.png",
+      "sha256": "bea2dd3a421f251a8819ad4fc8c5d5cee364e88e368f9c66729057eda3647a92"
+    },
+    {
+      "file": "screenshots/15-card-drag-no-deployment.png",
+      "sha256": "299dfde5b47a8262f5bb73292d4b05fb1856a14cd98fd4d5cd968fdc6094f047"
+    },
+    {
+      "file": "screenshots/16-map-drag-deployment.png",
+      "sha256": "73921f7dbbfae3a2d775af9da049e94ee3bc3c8d31db1d5687ec29c006a182dc"
+    },
+    {
+      "file": "screenshots/17-battle-siege-and-navy.png",
+      "sha256": "7ce79bae0bef73171c25a673addec1b247e170e0a5c0856a89ece53a813de84d"
+    },
+    {
+      "file": "screenshots/18-battle-result.png",
+      "sha256": "09680aae905c0fbe19f225d356fc866470275e7811570e0e72dab0686e312331"
+    },
+    {
+      "file": "screenshots/19-fleet-landscape.png",
+      "sha256": "719a11bcf423a215b12366e50b9d55ad83f3829a82b1f19e7e989e17793fd8d9"
+    },
+    {
+      "file": "screenshots/20-fleet-repair-scrolled.png",
+      "sha256": "60bd58777074b7cca1ffb074f925073f228e3fc19866aa2c84250062a4e3ab11"
+    },
+    {
+      "file": "screenshots/21-build-landscape.png",
+      "sha256": "6c57045f97be8523f0d79f15922653195bf7f2e96df6ecfdaccd3b45279786d2"
+    },
+    {
+      "file": "screenshots/22-adventures-landscape.png",
+      "sha256": "f095b50c4479f4f17a4af423de98bfb9e4994348b3db7e698cca56b042d979ff"
+    },
+    {
+      "file": "screenshots/23-next-mission-requirements.png",
+      "sha256": "b88069121129b287efd880783514ea598c6684c247930fabed85544d62ba4625"
+    },
+    {
+      "file": "screenshots/24-store-landscape.png",
+      "sha256": "8b468320d970666eda6c66626e4a44430127e6ad7dc1f88df2d4774855c8a346"
+    }
+  ],
+  "report_word_count": 7388,
+  "implementation_status": "Proposed only",
+  "known_limits": [
+    "No physical touch, audio, haptic or performance validation",
+    "No purchase or restore test",
+    "No complete province/event/online coverage"
+  ]
+}

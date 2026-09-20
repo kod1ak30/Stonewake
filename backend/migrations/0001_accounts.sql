@@ -1,0 +1,15 @@
+PRAGMA foreign_keys=ON;
+CREATE TABLE accounts(id TEXT PRIMARY KEY, apple_sub TEXT NOT NULL UNIQUE, state TEXT NOT NULL, revision INTEGER NOT NULL DEFAULT 0, created_at INTEGER NOT NULL, shield_until INTEGER NOT NULL DEFAULT 0);
+CREATE TABLE sessions(hash TEXT PRIMARY KEY, account_id TEXT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE, expires_at INTEGER NOT NULL);
+CREATE INDEX sessions_account ON sessions(account_id);
+CREATE TABLE challenges(id TEXT PRIMARY KEY, nonce TEXT NOT NULL, expires_at INTEGER NOT NULL);
+CREATE TABLE rate_limits(key TEXT PRIMARY KEY, count INTEGER NOT NULL, expires_at INTEGER NOT NULL);
+CREATE TABLE backups(account_id TEXT PRIMARY KEY REFERENCES accounts(id) ON DELETE CASCADE, payload TEXT NOT NULL, revision INTEGER NOT NULL, updated_at INTEGER NOT NULL);
+CREATE TABLE backup_history(id TEXT PRIMARY KEY, account_id TEXT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE, payload TEXT NOT NULL, revision INTEGER NOT NULL, created_at INTEGER NOT NULL);
+CREATE TABLE requests(account_id TEXT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE, request_id TEXT NOT NULL, response TEXT NOT NULL, created_at INTEGER NOT NULL, PRIMARY KEY(account_id,request_id));
+CREATE TABLE battles(id TEXT PRIMARY KEY, attacker_id TEXT NOT NULL REFERENCES accounts(id), defender_id TEXT REFERENCES accounts(id), kind TEXT NOT NULL, input TEXT NOT NULL, started_at INTEGER NOT NULL, finished_at INTEGER, response TEXT, command_seq INTEGER NOT NULL DEFAULT 0);
+CREATE INDEX battles_attacker ON battles(attacker_id,finished_at);
+CREATE TABLE reports(id TEXT NOT NULL, account_id TEXT NOT NULL REFERENCES accounts(id), payload TEXT NOT NULL, created_at INTEGER NOT NULL, PRIMARY KEY(id,account_id));
+CREATE TABLE purchases(environment TEXT NOT NULL, transaction_id TEXT NOT NULL, account_id TEXT NOT NULL REFERENCES accounts(id), product_id TEXT NOT NULL, gems INTEGER NOT NULL, purchased_at INTEGER NOT NULL, revoked_at INTEGER, PRIMARY KEY(environment,transaction_id));
+CREATE TABLE notification_receipts(id TEXT PRIMARY KEY, created_at INTEGER NOT NULL);
+CREATE TABLE mutation_guard(ok INTEGER NOT NULL CHECK(ok=1));

@@ -1,0 +1,5 @@
+Built-in imagegen, 2026-09-19. Original painted coastal terrain, no reference image.
+
+Square continuous world terrain painting for Stonewake, medieval isometric ground plane, no interface, text, grid, buildings, ships, people, roads or settlements. Natural rocky diagonal shoreline from left edge about 59% height to right edge about 12%, ocean above, broad open sunny olive-green meadow below. Central gameplay area unobstructed, only low rocks/shrubs and trees near outer bottom/right edges. Detailed classic painted medieval strategy style, balanced daylight, blue teal sea. No horizon, sky, large cliffs, mirrored landmarks, tiled seams or empty margins.
+
+Requested 3072 square; built-in returned 1254 square. Preserved returned original PNG. Rendered as fixed world rectangle (-1500,-1200,4200,4400), calibrated by sampling shoreline color and visually inspecting docks/sea lanes.

@@ -1,0 +1,295 @@
+[
+  {
+    "chapter": "Saltwind Cove",
+    "level": 3,
+    "veteran": false,
+    "won": true,
+    "destruction": 38,
+    "duration": 26.25,
+    "landed": 24,
+    "ships": {
+      "cog": true,
+      "escort": true
+    },
+    "beach": 1
+  },
+  {
+    "chapter": "Saltwind Cove",
+    "level": 10,
+    "veteran": true,
+    "won": true,
+    "destruction": 50,
+    "duration": 14.75,
+    "landed": 17,
+    "ships": {
+      "cog": true,
+      "escort": true,
+      "siege": true
+    },
+    "beach": 1
+  },
+  {
+    "chapter": "The Lantern Run",
+    "level": 4,
+    "veteran": false,
+    "won": true,
+    "destruction": 100,
+    "duration": 83.75,
+    "landed": 30,
+    "ships": {
+      "cog": true,
+      "escort": true
+    },
+    "beach": 1
+  },
+  {
+    "chapter": "The Lantern Run",
+    "level": 10,
+    "veteran": true,
+    "won": true,
+    "destruction": 100,
+    "duration": 83.75,
+    "landed": 39,
+    "ships": {
+      "cog": true,
+      "escort": true,
+      "siege": true
+    },
+    "beach": 1
+  },
+  {
+    "chapter": "Breakwater Gate",
+    "level": 4,
+    "veteran": false,
+    "won": true,
+    "destruction": 55,
+    "duration": 30.75,
+    "landed": 30,
+    "ships": {
+      "cog": true,
+      "escort": true
+    },
+    "beach": 1
+  },
+  {
+    "chapter": "Breakwater Gate",
+    "level": 10,
+    "veteran": true,
+    "won": true,
+    "destruction": 55,
+    "duration": 18.25,
+    "landed": 31,
+    "ships": {
+      "cog": true,
+      "escort": true,
+      "siege": true
+    },
+    "beach": 1
+  },
+  {
+    "chapter": "Iron Shoals",
+    "level": 5,
+    "veteran": false,
+    "won": true,
+    "destruction": 50,
+    "duration": 24.75,
+    "landed": 36,
+    "ships": {
+      "cog": true,
+      "escort": true
+    },
+    "beach": 1
+  },
+  {
+    "chapter": "Iron Shoals",
+    "level": 10,
+    "veteran": true,
+    "won": true,
+    "destruction": 50,
+    "duration": 21,
+    "landed": 39,
+    "ships": {
+      "cog": true,
+      "escort": true,
+      "siege": true
+    },
+    "beach": 1
+  },
+  {
+    "chapter": "The Drowned Bells",
+    "level": 5,
+    "veteran": false,
+    "won": true,
+    "destruction": 46,
+    "duration": 26.5,
+    "landed": 36,
+    "ships": {
+      "cog": true,
+      "escort": false
+    },
+    "beach": 1
+  },
+  {
+    "chapter": "The Drowned Bells",
+    "level": 10,
+    "veteran": true,
+    "won": true,
+    "destruction": 46,
+    "duration": 20.25,
+    "landed": 39,
+    "ships": {
+      "cog": true,
+      "escort": true,
+      "siege": true
+    },
+    "beach": 1
+  },
+  {
+    "chapter": "Red Sails",
+    "level": 6,
+    "veteran": false,
+    "won": true,
+    "destruction": 43,
+    "duration": 24.25,
+    "landed": 39,
+    "ships": {
+      "cog": true,
+      "escort": false
+    },
+    "beach": 1
+  },
+  {
+    "chapter": "Red Sails",
+    "level": 10,
+    "veteran": true,
+    "won": true,
+    "destruction": 50,
+    "duration": 22.25,
+    "landed": 39,
+    "ships": {
+      "cog": true,
+      "escort": true,
+      "siege": true
+    },
+    "beach": 1
+  },
+  {
+    "chapter": "Greywater Reach",
+    "level": 6,
+    "veteran": false,
+    "won": true,
+    "destruction": 100,
+    "duration": 83.75,
+    "landed": 39,
+    "ships": {
+      "cog": true,
+      "escort": false
+    },
+    "beach": 1
+  },
+  {
+    "chapter": "Greywater Reach",
+    "level": 10,
+    "veteran": true,
+    "won": true,
+    "destruction": 100,
+    "duration": 83.75,
+    "landed": 39,
+    "ships": {
+      "cog": true,
+      "escort": true,
+      "siege": true
+    },
+    "beach": 1
+  },
+  {
+    "chapter": "The Splinter Coast",
+    "level": 7,
+    "veteran": false,
+    "won": true,
+    "destruction": 47,
+    "duration": 26.75,
+    "landed": 39,
+    "ships": {
+      "cog": true,
+      "escort": false,
+      "siege": true
+    },
+    "beach": 1
+  },
+  {
+    "chapter": "The Splinter Coast",
+    "level": 10,
+    "veteran": true,
+    "won": true,
+    "destruction": 47,
+    "duration": 22.75,
+    "landed": 39,
+    "ships": {
+      "cog": true,
+      "escort": true,
+      "siege": true
+    },
+    "beach": 1
+  },
+  {
+    "chapter": "Crown Anchorage",
+    "level": 8,
+    "veteran": false,
+    "won": true,
+    "destruction": 47,
+    "duration": 27,
+    "landed": 39,
+    "ships": {
+      "cog": true,
+      "escort": false,
+      "siege": true
+    },
+    "beach": 1
+  },
+  {
+    "chapter": "Crown Anchorage",
+    "level": 10,
+    "veteran": true,
+    "won": true,
+    "destruction": 47,
+    "duration": 23,
+    "landed": 39,
+    "ships": {
+      "cog": true,
+      "escort": true,
+      "siege": true
+    },
+    "beach": 1
+  },
+  {
+    "chapter": "The Last Beacon",
+    "level": 9,
+    "veteran": false,
+    "won": true,
+    "destruction": 44,
+    "duration": 25.5,
+    "landed": 39,
+    "ships": {
+      "cog": true,
+      "escort": true,
+      "siege": true
+    },
+    "beach": 1
+  },
+  {
+    "chapter": "The Last Beacon",
+    "level": 10,
+    "veteran": true,
+    "won": true,
+    "destruction": 44,
+    "duration": 23,
+    "landed": 39,
+    "ships": {
+      "cog": true,
+      "escort": true,
+      "siege": true
+    },
+    "beach": 1
+  }
+]

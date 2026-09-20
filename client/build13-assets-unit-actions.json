@@ -1,0 +1,735 @@
+{
+  "asset": "Stonewake/Web/art/unit-actions-v13.png",
+  "source": "/Users/chrismozer/.codex/generated_images/01a0b852-4f50-75b2-99d8-563c4e224897/exec-749f4dfc-4361-4ad0-8a10-3dc0b50ef61d.png",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "format": "RGBA PNG",
+  "sha256": "ac2f7eac68390c2690a9ec32cff2bc1bee15aa9646a5cb8f02f3207781e48d36",
+  "rectConvention": "global half-open [left,top,right,bottom], row/column zero-based",
+  "nativeGrid": {
+    "columns": 4,
+    "rows": 3,
+    "nominalCell": [
+      362,
+      362
+    ]
+  },
+  "extraction": "Use safeRect rather than equal row slicing: infantry strike extends five pixels below the nominal first row. safeRect encloses all alpha > 8 plus three pixels; faint isolated alpha <= 8 speckles are excluded from suggested framing. alphaInclusiveRect records the broader all-nonzero-alpha extent. The raw PNG is unchanged. No sprite pixels were transformed.",
+  "alpha": {
+    "min": 0,
+    "max": 255,
+    "fullyTransparentPercent": 71.68470132169348
+  },
+  "sprites": [
+    {
+      "row": 0,
+      "column": 0,
+      "unit": "infantry",
+      "phase": "ready",
+      "searchRegion": [
+        0,
+        0,
+        362,
+        395
+      ],
+      "alphaBoundsByThreshold": {
+        "0": [
+          27,
+          48,
+          356,
+          387
+        ],
+        "8": [
+          97,
+          93,
+          289,
+          346
+        ],
+        "16": [
+          98,
+          94,
+          289,
+          346
+        ],
+        "32": [
+          98,
+          94,
+          289,
+          345
+        ]
+      },
+      "safeRect": [
+        94,
+        90,
+        292,
+        349
+      ],
+      "safeSize": [
+        198,
+        259
+      ],
+      "anchorHint": [
+        194,
+        345
+      ],
+      "note": "anchorHint is bounding-box bottom center, not a rigged skeletal ground anchor",
+      "alphaInclusiveRect": [
+        25,
+        46,
+        358,
+        389
+      ]
+    },
+    {
+      "row": 0,
+      "column": 1,
+      "unit": "infantry",
+      "phase": "windup",
+      "searchRegion": [
+        362,
+        0,
+        724,
+        395
+      ],
+      "alphaBoundsByThreshold": {
+        "0": [
+          385,
+          23,
+          724,
+          395
+        ],
+        "8": [
+          430,
+          55,
+          647,
+          353
+        ],
+        "16": [
+          430,
+          55,
+          646,
+          353
+        ],
+        "32": [
+          431,
+          55,
+          646,
+          353
+        ]
+      },
+      "safeRect": [
+        427,
+        52,
+        650,
+        356
+      ],
+      "safeSize": [
+        223,
+        304
+      ],
+      "anchorHint": [
+        538,
+        353
+      ],
+      "note": "anchorHint is bounding-box bottom center, not a rigged skeletal ground anchor",
+      "alphaInclusiveRect": [
+        383,
+        21,
+        724,
+        395
+      ]
+    },
+    {
+      "row": 0,
+      "column": 2,
+      "unit": "infantry",
+      "phase": "release",
+      "searchRegion": [
+        724,
+        0,
+        1086,
+        395
+      ],
+      "alphaBoundsByThreshold": {
+        "0": [
+          725,
+          21,
+          1078,
+          387
+        ],
+        "8": [
+          812,
+          105,
+          1074,
+          367
+        ],
+        "16": [
+          813,
+          105,
+          1074,
+          367
+        ],
+        "32": [
+          813,
+          105,
+          1074,
+          367
+        ]
+      },
+      "safeRect": [
+        809,
+        102,
+        1077,
+        370
+      ],
+      "safeSize": [
+        268,
+        268
+      ],
+      "anchorHint": [
+        944,
+        367
+      ],
+      "note": "anchorHint is bounding-box bottom center, not a rigged skeletal ground anchor",
+      "alphaInclusiveRect": [
+        724,
+        19,
+        1080,
+        389
+      ]
+    },
+    {
+      "row": 0,
+      "column": 3,
+      "unit": "infantry",
+      "phase": "recovery",
+      "searchRegion": [
+        1086,
+        0,
+        1448,
+        395
+      ],
+      "alphaBoundsByThreshold": {
+        "0": [
+          1099,
+          36,
+          1430,
+          395
+        ],
+        "8": [
+          1188,
+          93,
+          1356,
+          353
+        ],
+        "16": [
+          1188,
+          93,
+          1356,
+          353
+        ],
+        "32": [
+          1188,
+          93,
+          1355,
+          352
+        ]
+      },
+      "safeRect": [
+        1185,
+        90,
+        1359,
+        356
+      ],
+      "safeSize": [
+        174,
+        266
+      ],
+      "anchorHint": [
+        1272,
+        352
+      ],
+      "note": "anchorHint is bounding-box bottom center, not a rigged skeletal ground anchor",
+      "alphaInclusiveRect": [
+        1097,
+        34,
+        1432,
+        395
+      ]
+    },
+    {
+      "row": 1,
+      "column": 0,
+      "unit": "archer",
+      "phase": "ready",
+      "searchRegion": [
+        0,
+        395,
+        362,
+        740
+      ],
+      "alphaBoundsByThreshold": {
+        "0": [
+          17,
+          411,
+          354,
+          713
+        ],
+        "8": [
+          82,
+          424,
+          307,
+          701
+        ],
+        "16": [
+          82,
+          424,
+          307,
+          701
+        ],
+        "32": [
+          82,
+          424,
+          307,
+          701
+        ]
+      },
+      "safeRect": [
+        79,
+        421,
+        310,
+        704
+      ],
+      "safeSize": [
+        231,
+        283
+      ],
+      "anchorHint": [
+        194,
+        701
+      ],
+      "note": "anchorHint is bounding-box bottom center, not a rigged skeletal ground anchor",
+      "alphaInclusiveRect": [
+        15,
+        409,
+        356,
+        715
+      ]
+    },
+    {
+      "row": 1,
+      "column": 1,
+      "unit": "archer",
+      "phase": "windup",
+      "searchRegion": [
+        362,
+        395,
+        724,
+        740
+      ],
+      "alphaBoundsByThreshold": {
+        "0": [
+          395,
+          400,
+          724,
+          740
+        ],
+        "8": [
+          442,
+          421,
+          695,
+          706
+        ],
+        "16": [
+          442,
+          422,
+          694,
+          706
+        ],
+        "32": [
+          442,
+          422,
+          694,
+          706
+        ]
+      },
+      "safeRect": [
+        439,
+        418,
+        698,
+        709
+      ],
+      "safeSize": [
+        259,
+        291
+      ],
+      "anchorHint": [
+        568,
+        706
+      ],
+      "note": "anchorHint is bounding-box bottom center, not a rigged skeletal ground anchor",
+      "alphaInclusiveRect": [
+        393,
+        398,
+        724,
+        740
+      ]
+    },
+    {
+      "row": 1,
+      "column": 2,
+      "unit": "archer",
+      "phase": "release",
+      "searchRegion": [
+        724,
+        395,
+        1086,
+        740
+      ],
+      "alphaBoundsByThreshold": {
+        "0": [
+          725,
+          398,
+          1086,
+          727
+        ],
+        "8": [
+          803,
+          422,
+          1035,
+          707
+        ],
+        "16": [
+          803,
+          422,
+          1035,
+          706
+        ],
+        "32": [
+          803,
+          422,
+          1035,
+          706
+        ]
+      },
+      "safeRect": [
+        800,
+        419,
+        1038,
+        710
+      ],
+      "safeSize": [
+        238,
+        291
+      ],
+      "anchorHint": [
+        919,
+        706
+      ],
+      "note": "anchorHint is bounding-box bottom center, not a rigged skeletal ground anchor",
+      "alphaInclusiveRect": [
+        724,
+        396,
+        1086,
+        729
+      ]
+    },
+    {
+      "row": 1,
+      "column": 3,
+      "unit": "archer",
+      "phase": "recovery",
+      "searchRegion": [
+        1086,
+        395,
+        1448,
+        740
+      ],
+      "alphaBoundsByThreshold": {
+        "0": [
+          1087,
+          420,
+          1412,
+          736
+        ],
+        "8": [
+          1168,
+          432,
+          1371,
+          706
+        ],
+        "16": [
+          1168,
+          432,
+          1371,
+          706
+        ],
+        "32": [
+          1168,
+          432,
+          1371,
+          706
+        ]
+      },
+      "safeRect": [
+        1165,
+        429,
+        1374,
+        709
+      ],
+      "safeSize": [
+        209,
+        280
+      ],
+      "anchorHint": [
+        1270,
+        706
+      ],
+      "note": "anchorHint is bounding-box bottom center, not a rigged skeletal ground anchor",
+      "alphaInclusiveRect": [
+        1086,
+        418,
+        1414,
+        738
+      ]
+    },
+    {
+      "row": 2,
+      "column": 0,
+      "unit": "medic",
+      "phase": "ready",
+      "searchRegion": [
+        0,
+        740,
+        362,
+        1086
+      ],
+      "alphaBoundsByThreshold": {
+        "0": [
+          0,
+          761,
+          362,
+          1046
+        ],
+        "8": [
+          89,
+          764,
+          291,
+          1035
+        ],
+        "16": [
+          89,
+          764,
+          291,
+          1035
+        ],
+        "32": [
+          89,
+          764,
+          291,
+          1035
+        ]
+      },
+      "safeRect": [
+        86,
+        761,
+        294,
+        1038
+      ],
+      "safeSize": [
+        208,
+        277
+      ],
+      "anchorHint": [
+        190,
+        1035
+      ],
+      "note": "anchorHint is bounding-box bottom center, not a rigged skeletal ground anchor",
+      "alphaInclusiveRect": [
+        0,
+        759,
+        362,
+        1048
+      ]
+    },
+    {
+      "row": 2,
+      "column": 1,
+      "unit": "medic",
+      "phase": "windup",
+      "searchRegion": [
+        362,
+        740,
+        724,
+        1086
+      ],
+      "alphaBoundsByThreshold": {
+        "0": [
+          363,
+          740,
+          714,
+          1058
+        ],
+        "8": [
+          440,
+          770,
+          657,
+          1034
+        ],
+        "16": [
+          440,
+          770,
+          656,
+          1034
+        ],
+        "32": [
+          440,
+          770,
+          656,
+          1034
+        ]
+      },
+      "safeRect": [
+        437,
+        767,
+        660,
+        1037
+      ],
+      "safeSize": [
+        223,
+        270
+      ],
+      "anchorHint": [
+        548,
+        1034
+      ],
+      "note": "anchorHint is bounding-box bottom center, not a rigged skeletal ground anchor",
+      "alphaInclusiveRect": [
+        362,
+        740,
+        716,
+        1060
+      ]
+    },
+    {
+      "row": 2,
+      "column": 2,
+      "unit": "medic",
+      "phase": "release",
+      "searchRegion": [
+        724,
+        740,
+        1086,
+        1086
+      ],
+      "alphaBoundsByThreshold": {
+        "0": [
+          737,
+          757,
+          1086,
+          1062
+        ],
+        "8": [
+          801,
+          768,
+          1046,
+          1038
+        ],
+        "16": [
+          801,
+          768,
+          1042,
+          1038
+        ],
+        "32": [
+          801,
+          768,
+          1037,
+          1038
+        ]
+      },
+      "safeRect": [
+        798,
+        765,
+        1049,
+        1041
+      ],
+      "safeSize": [
+        251,
+        276
+      ],
+      "anchorHint": [
+        919,
+        1038
+      ],
+      "note": "anchorHint is bounding-box bottom center, not a rigged skeletal ground anchor",
+      "alphaInclusiveRect": [
+        735,
+        755,
+        1086,
+        1064
+      ]
+    },
+    {
+      "row": 2,
+      "column": 3,
+      "unit": "medic",
+      "phase": "recovery",
+      "searchRegion": [
+        1086,
+        740,
+        1448,
+        1086
+      ],
+      "alphaBoundsByThreshold": {
+        "0": [
+          1087,
+          763,
+          1430,
+          1068
+        ],
+        "8": [
+          1170,
+          766,
+          1364,
+          1034
+        ],
+        "16": [
+          1171,
+          766,
+          1364,
+          1034
+        ],
+        "32": [
+          1171,
+          766,
+          1364,
+          1034
+        ]
+      },
+      "safeRect": [
+        1167,
+        763,
+        1367,
+        1037
+      ],
+      "safeSize": [
+        200,
+        274
+      ],
+      "anchorHint": [
+        1268,
+        1034
+      ],
+      "note": "anchorHint is bounding-box bottom center, not a rigged skeletal ground anchor",
+      "alphaInclusiveRect": [
+        1086,
+        761,
+        1432,
+        1070
+      ]
+    }
+  ]
+}

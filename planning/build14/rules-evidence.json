@@ -1,0 +1,142 @@
+{
+  "checks": 280,
+  "economy": [
+    {
+      "level": 1,
+      "capacity": 1550,
+      "storeLimit": 1,
+      "armyCapacity": 12,
+      "keepCost": {
+        "gold": 476,
+        "wood": 230,
+        "stone": 272,
+        "food": 153
+      },
+      "allowed": true
+    },
+    {
+      "level": 2,
+      "capacity": 2200,
+      "storeLimit": 1,
+      "armyCapacity": 18,
+      "keepCost": {
+        "gold": 809,
+        "wood": 390,
+        "stone": 462,
+        "food": 260
+      },
+      "allowed": true
+    },
+    {
+      "level": 3,
+      "capacity": 3050,
+      "storeLimit": 1,
+      "armyCapacity": 24,
+      "keepCost": {
+        "gold": 1376,
+        "wood": 663,
+        "stone": 786,
+        "food": 442
+      },
+      "allowed": true
+    },
+    {
+      "level": 4,
+      "capacity": 6900,
+      "storeLimit": 2,
+      "armyCapacity": 30,
+      "keepCost": {
+        "gold": 2339,
+        "wood": 1128,
+        "stone": 1336,
+        "food": 752
+      },
+      "allowed": true
+    },
+    {
+      "level": 5,
+      "capacity": 9850,
+      "storeLimit": 2,
+      "armyCapacity": 36,
+      "keepCost": {
+        "gold": 3976,
+        "wood": 1917,
+        "stone": 2272,
+        "food": 1278
+      },
+      "allowed": true
+    },
+    {
+      "level": 6,
+      "capacity": 14150,
+      "storeLimit": 2,
+      "armyCapacity": 42,
+      "keepCost": {
+        "gold": 6759,
+        "wood": 3259,
+        "stone": 3862,
+        "food": 2172
+      },
+      "allowed": true
+    },
+    {
+      "level": 7,
+      "capacity": 29589,
+      "storeLimit": 3,
+      "armyCapacity": 48,
+      "keepCost": {
+        "gold": 11489,
+        "wood": 5540,
+        "stone": 6565,
+        "food": 3693
+      },
+      "allowed": true
+    },
+    {
+      "level": 8,
+      "capacity": 43507,
+      "storeLimit": 3,
+      "armyCapacity": 54,
+      "keepCost": {
+        "gold": 19532,
+        "wood": 9417,
+        "stone": 11161,
+        "food": 6278
+      },
+      "allowed": true
+    },
+    {
+      "level": 9,
+      "capacity": 64259,
+      "storeLimit": 3,
+      "armyCapacity": 60,
+      "keepCost": {
+        "gold": 33205,
+        "wood": 16009,
+        "stone": 18974,
+        "food": 10673
+      },
+      "allowed": true
+    },
+    {
+      "level": 10,
+      "capacity": 95265,
+      "storeLimit": 3,
+      "armyCapacity": 66,
+      "keepCost": {
+        "gold": 56448,
+        "wood": 27216,
+        "stone": 32256,
+        "food": 18144
+      },
+      "allowed": false
+    }
+  ],
+  "sea": {
+    "duration": 16.5,
+    "won": true,
+    "landed": 25,
+    "rescued": 1
+  },
+  "timestamp": "2026-09-20T02:58:40.574Z"
+}

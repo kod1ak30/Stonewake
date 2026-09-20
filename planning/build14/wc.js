@@ -1,0 +1,38 @@
+var wc = {
+    cutter: {
+      name: `Fishing cutter`,
+      description: `Reliable coastal voyages bring food and timber.`,
+      unlock: 1,
+      cost: bc(140, 160, 25),
+      time: 90,
+      power: 12,
+      sprite: 0,
+    },
+    cog: {
+      name: `Merchant cog`,
+      description: `Large cargo holds earn gold on trading voyages.`,
+      unlock: 2,
+      cost: bc(260, 280, 80),
+      time: 150,
+      power: 25,
+      sprite: 1,
+    },
+    galley: {
+      name: `War galley`,
+      description: `Escort merchants and clear pirate waters.`,
+      unlock: 3,
+      cost: bc(440, 350, 160),
+      time: 210,
+      power: 48,
+      sprite: 2,
+    },
+    bombard: {
+      name: `Bombard ship`,
+      description: `Heavy guns open the most dangerous sea routes.`,
+      unlock: 5,
+      cost: bc(760, 520, 340),
+      time: 300,
+      power: 90,
+      sprite: 3,
+    },
+  };

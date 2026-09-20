@@ -1,0 +1,287 @@
+{
+  "image": "art/sculpted-buildings-v13.png",
+  "width": 1448,
+  "height": 1086,
+  "alpha": true,
+  "sha256": "5db7da95f944fc1d93398176d6ba81cfbee5026b4431b25bee50d0837a5f1d41",
+  "layout": "4 columns by 3 rows, original generated layout; use measured rects rather than equal cell slicing",
+  "measurement": "Alpha >4 bounding box with 10px transparent padding. All expanded rectangles are disjoint and within canvas. Raw PNG bytes unchanged. Ground anchor is the visible bottom edge excluding padding.",
+  "sprites": [
+    {
+      "kind": "keep",
+      "level": 1,
+      "index": 0,
+      "row": 0,
+      "column": 0,
+      "rect": [
+        81,
+        102,
+        218,
+        267
+      ],
+      "anchor": [
+        0.5,
+        0.9625468164794008
+      ],
+      "contentBounds": [
+        91,
+        112,
+        198,
+        247
+      ]
+    },
+    {
+      "kind": "keep",
+      "level": 4,
+      "index": 1,
+      "row": 0,
+      "column": 1,
+      "rect": [
+        406,
+        82,
+        280,
+        297
+      ],
+      "anchor": [
+        0.5,
+        0.9663299663299664
+      ],
+      "contentBounds": [
+        416,
+        92,
+        260,
+        277
+      ]
+    },
+    {
+      "kind": "keep",
+      "level": 8,
+      "index": 2,
+      "row": 0,
+      "column": 2,
+      "rect": [
+        776,
+        61,
+        294,
+        315
+      ],
+      "anchor": [
+        0.5,
+        0.9682539682539683
+      ],
+      "contentBounds": [
+        786,
+        71,
+        274,
+        295
+      ]
+    },
+    {
+      "kind": "cottage",
+      "level": 1,
+      "index": 3,
+      "row": 0,
+      "column": 3,
+      "rect": [
+        1152,
+        131,
+        231,
+        242
+      ],
+      "anchor": [
+        0.5,
+        0.9586776859504132
+      ],
+      "contentBounds": [
+        1162,
+        141,
+        211,
+        222
+      ]
+    },
+    {
+      "kind": "cottage",
+      "level": 4,
+      "index": 4,
+      "row": 1,
+      "column": 0,
+      "rect": [
+        58,
+        430,
+        271,
+        276
+      ],
+      "anchor": [
+        0.5,
+        0.9637681159420289
+      ],
+      "contentBounds": [
+        68,
+        440,
+        251,
+        256
+      ]
+    },
+    {
+      "kind": "cottage",
+      "level": 8,
+      "index": 5,
+      "row": 1,
+      "column": 1,
+      "rect": [
+        426,
+        413,
+        278,
+        292
+      ],
+      "anchor": [
+        0.5,
+        0.9657534246575342
+      ],
+      "contentBounds": [
+        436,
+        423,
+        258,
+        272
+      ]
+    },
+    {
+      "kind": "barracks",
+      "level": 1,
+      "index": 6,
+      "row": 1,
+      "column": 2,
+      "rect": [
+        780,
+        473,
+        266,
+        231
+      ],
+      "anchor": [
+        0.5,
+        0.9567099567099567
+      ],
+      "contentBounds": [
+        790,
+        483,
+        246,
+        211
+      ]
+    },
+    {
+      "kind": "barracks",
+      "level": 4,
+      "index": 7,
+      "row": 1,
+      "column": 3,
+      "rect": [
+        1132,
+        404,
+        276,
+        300
+      ],
+      "anchor": [
+        0.5,
+        0.9666666666666667
+      ],
+      "contentBounds": [
+        1142,
+        414,
+        256,
+        280
+      ]
+    },
+    {
+      "kind": "barracks",
+      "level": 8,
+      "index": 8,
+      "row": 2,
+      "column": 0,
+      "rect": [
+        54,
+        727,
+        307,
+        305
+      ],
+      "anchor": [
+        0.5,
+        0.9672131147540983
+      ],
+      "contentBounds": [
+        64,
+        737,
+        287,
+        285
+      ]
+    },
+    {
+      "kind": "storehouse",
+      "level": 1,
+      "index": 9,
+      "row": 2,
+      "column": 1,
+      "rect": [
+        427,
+        802,
+        259,
+        218
+      ],
+      "anchor": [
+        0.5,
+        0.9541284403669725
+      ],
+      "contentBounds": [
+        437,
+        812,
+        239,
+        198
+      ]
+    },
+    {
+      "kind": "storehouse",
+      "level": 4,
+      "index": 10,
+      "row": 2,
+      "column": 2,
+      "rect": [
+        771,
+        783,
+        289,
+        247
+      ],
+      "anchor": [
+        0.5,
+        0.9595141700404858
+      ],
+      "contentBounds": [
+        781,
+        793,
+        269,
+        227
+      ]
+    },
+    {
+      "kind": "storehouse",
+      "level": 8,
+      "index": 11,
+      "row": 2,
+      "column": 3,
+      "rect": [
+        1122,
+        738,
+        301,
+        294
+      ],
+      "anchor": [
+        0.5,
+        0.9659863945578231
+      ],
+      "contentBounds": [
+        1132,
+        748,
+        281,
+        274
+      ]
+    }
+  ]
+}

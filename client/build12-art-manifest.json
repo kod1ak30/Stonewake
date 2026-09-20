@@ -1,0 +1,64 @@
+{
+  "build": 12,
+  "production": [
+    "Stonewake/Web/art/lighthouse-stages-v12.png"
+  ],
+  "proofOnly": "Canonical soldier and ship do not replace the painted battle roster. The source soldier also supplies bronze statue geometry.",
+  "source": [
+    "client/art-source/stonewake-rigs-v12.json",
+    "client/art-source/canonical-models.js"
+  ],
+  "generation": "lighthouse built-in imagegen, canonical atlases deterministic authored geometry",
+  "files": [
+    {
+      "path": "Stonewake/Web/art/canonical-v12/soldier-stagger.png",
+      "bytes": 166863,
+      "sha256": "e0576ecb8e05b7b9365b5fd4ef638bd0b00bc7c5615a9a3d56a66aca742f174d"
+    },
+    {
+      "path": "Stonewake/Web/art/canonical-v12/ship.png",
+      "bytes": 281483,
+      "sha256": "246d91d2a1a4f331e5b45f3c084f7a82ea369e3f5bc54564973088b6d33414ac"
+    },
+    {
+      "path": "Stonewake/Web/art/canonical-v12/soldier-idle.png",
+      "bytes": 139827,
+      "sha256": "338812dad352fcd2c0104d478e1e313c23410326f449c8723b6ef8ef560b7333"
+    },
+    {
+      "path": "Stonewake/Web/art/canonical-v12/lighthouse.png",
+      "bytes": 297492,
+      "sha256": "f9c13ee9c5cd407e1058a91cf215c3a4a6f77791103311bac461002013fb21c2"
+    },
+    {
+      "path": "Stonewake/Web/art/canonical-v12/source-gallery.png",
+      "bytes": 109690,
+      "sha256": "5a6e61d9f28faa3d988f649a0ea0393c7b38f14ffef06126accd316bcff29667"
+    },
+    {
+      "path": "Stonewake/Web/art/canonical-v12/soldier-work.png",
+      "bytes": 270643,
+      "sha256": "2a8f73d4d78ca91ca817e2ad6f99c7015a374b4d017c007fb2259bd5e7540a1a"
+    },
+    {
+      "path": "Stonewake/Web/art/canonical-v12/soldier-attack.png",
+      "bytes": 270643,
+      "sha256": "2a8f73d4d78ca91ca817e2ad6f99c7015a374b4d017c007fb2259bd5e7540a1a"
+    },
+    {
+      "path": "Stonewake/Web/art/canonical-v12/soldier-death.png",
+      "bytes": 503917,
+      "sha256": "4348fc4c38056ad01990c009752ad1bcd75ffda72d63cc28df7c5c9495351518"
+    },
+    {
+      "path": "Stonewake/Web/art/canonical-v12/soldier-walk.png",
+      "bytes": 329732,
+      "sha256": "447f9160e70d29cb3a1a634d554d1027dc299a3d4333acd868902204eec8ee42"
+    },
+    {
+      "path": "Stonewake/Web/art/lighthouse-stages-v12.png",
+      "bytes": 1139868,
+      "sha256": "b2196783bb752e53fdb1eee14c11e4932652df79b1766afe851b24996f724efd"
+    }
+  ]
+}

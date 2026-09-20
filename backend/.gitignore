@@ -1,0 +1,5 @@
+node_modules/
+.node_modules-icloud-build14/
+.wrangler/
+.dev.vars
+.env*

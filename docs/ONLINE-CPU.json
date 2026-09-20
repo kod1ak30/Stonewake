@@ -1,0 +1,102 @@
+{
+  "generatedAt": "2026-09-19T21:45:51.357Z",
+  "runtime": "v25.5.0",
+  "platform": "darwin",
+  "arch": "arm64",
+  "rulesHash": "fec47fe0bfe2557e48bac5eb3442b2a570cdf1658e4875a1eceaf656d78a53f4",
+  "warning": "Local Node CPU observations only, not a Cloudflare performance guarantee.",
+  "results": [
+    {
+      "name": "early_campaign_naval",
+      "buildings": 41,
+      "troops": 12,
+      "duration": 51.75,
+      "frames": 105,
+      "fullResultBytes": 1550154,
+      "summaryBytes": 405,
+      "runs": [
+        {
+          "wallMs": 36.6,
+          "cpuMs": 86.2
+        },
+        {
+          "wallMs": 32.6,
+          "cpuMs": 61.6
+        },
+        {
+          "wallMs": 32.9,
+          "cpuMs": 81.8
+        }
+      ]
+    },
+    {
+      "name": "late_campaign_72_troops_naval",
+      "buildings": 47,
+      "troops": 72,
+      "duration": 27.75,
+      "frames": 57,
+      "fullResultBytes": 2067095,
+      "summaryBytes": 408,
+      "runs": [
+        {
+          "wallMs": 208.4,
+          "cpuMs": 317.8
+        },
+        {
+          "wallMs": 209.3,
+          "cpuMs": 347.3
+        },
+        {
+          "wallMs": 195,
+          "cpuMs": 199.1
+        }
+      ]
+    },
+    {
+      "name": "saved_city_scheduled_raid",
+      "buildings": 17,
+      "troops": 20,
+      "duration": 120,
+      "frames": 242,
+      "fullResultBytes": 3204144,
+      "summaryBytes": 329,
+      "runs": [
+        {
+          "wallMs": 65.7,
+          "cpuMs": 155.8
+        },
+        {
+          "wallMs": 65,
+          "cpuMs": 72.5
+        },
+        {
+          "wallMs": 65.7,
+          "cpuMs": 68.9
+        }
+      ]
+    },
+    {
+      "name": "expanded_saved_city_corner_keep_72_troops_naval",
+      "buildings": 17,
+      "troops": 72,
+      "duration": 48.5,
+      "frames": 99,
+      "fullResultBytes": 2772632,
+      "summaryBytes": 407,
+      "runs": [
+        {
+          "wallMs": 511.6,
+          "cpuMs": 739.7
+        },
+        {
+          "wallMs": 601.3,
+          "cpuMs": 960.7
+        },
+        {
+          "wallMs": 550.9,
+          "cpuMs": 670.2
+        }
+      ]
+    }
+  ]
+}

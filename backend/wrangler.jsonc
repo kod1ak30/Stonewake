@@ -1,0 +1,11 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "stonewake-service",
+  "main": "src/index.mjs",
+  "compatibility_date": "2026-09-19",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": {"enabled": true, "head_sampling_rate": 0.1},
+  "vars": {"APPLE_BUNDLE_ID": "com.chrismozer.stonewake", "APPLE_ENVIRONMENT": "Sandbox", "APPLE_APP_ID": "", "PURCHASES_ENABLED": "false", "PRODUCT_CATALOG": "{}"},
+  "d1_databases": [{"binding": "DB", "database_name": "stonewake", "database_id": "00000000-0000-0000-0000-000000000000", "migrations_dir": "migrations"}],
+  "rules": [{"type":"Data","globs":["**/*.cer"],"fallthrough":true}]
+}

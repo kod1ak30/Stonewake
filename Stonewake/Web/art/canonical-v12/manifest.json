@@ -1,0 +1,117 @@
+{
+  "version": 1,
+  "source": "client/art-source/stonewake-rigs-v12.json",
+  "maxLevel": 10,
+  "assets": [
+    {
+      "name": "soldier-idle.png",
+      "columns": 12,
+      "rows": 8,
+      "cell": [
+        128,
+        144
+      ],
+      "pivot": [
+        64,
+        130
+      ],
+      "duration": 2.8
+    },
+    {
+      "name": "soldier-walk.png",
+      "columns": 12,
+      "rows": 8,
+      "cell": [
+        128,
+        144
+      ],
+      "pivot": [
+        64,
+        130
+      ],
+      "duration": 0.8
+    },
+    {
+      "name": "soldier-work.png",
+      "columns": 12,
+      "rows": 8,
+      "cell": [
+        128,
+        144
+      ],
+      "pivot": [
+        64,
+        130
+      ],
+      "duration": 1.2
+    },
+    {
+      "name": "soldier-attack.png",
+      "columns": 12,
+      "rows": 8,
+      "cell": [
+        128,
+        144
+      ],
+      "pivot": [
+        64,
+        130
+      ],
+      "duration": 0.72
+    },
+    {
+      "name": "soldier-stagger.png",
+      "columns": 8,
+      "rows": 8,
+      "cell": [
+        128,
+        144
+      ],
+      "pivot": [
+        64,
+        130
+      ],
+      "duration": 0.36
+    },
+    {
+      "name": "soldier-death.png",
+      "columns": 12,
+      "rows": 8,
+      "cell": [
+        128,
+        144
+      ],
+      "pivot": [
+        64,
+        130
+      ],
+      "duration": 0.85
+    },
+    {
+      "name": "ship.png",
+      "columns": 8,
+      "rows": 3,
+      "cell": [
+        256,
+        240
+      ],
+      "pivot": [
+        128,
+        216
+      ]
+    },
+    {
+      "name": "lighthouse.png",
+      "columns": 8,
+      "rows": 3,
+      "cell": [
+        256,
+        320
+      ],
+      "pivot": [
+        128,
+        296
+      ]
+    }
+  ]
+}

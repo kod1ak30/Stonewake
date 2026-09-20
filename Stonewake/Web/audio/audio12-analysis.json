@@ -1,0 +1,34 @@
+{
+  "provenance": "Original equations, seeded noise and melodies; no sampled or downloaded recordings.",
+  "subjective_audition": "Not verified on physical speakers or headphones.",
+  "scout.m4a": {
+    "integrated_lufs": -25.0,
+    "true_peak_dbfs": -13.8,
+    "duration_seconds": 42.666666666666664,
+    "bpm": 90,
+    "loop": true,
+    "clipped_samples": 0,
+    "boundary_step": 0.00653076171875,
+    "ordinary_99_9_percentile_step": 0.01287841796875
+  },
+  "victory.m4a": {
+    "integrated_lufs": -25.0,
+    "true_peak_dbfs": -14.1,
+    "duration_seconds": 10.18888888888889,
+    "bpm": 108,
+    "loop": false,
+    "clipped_samples": 0,
+    "boundary_step": 0.0001220703125,
+    "ordinary_99_9_percentile_step": 0.018463134765625
+  },
+  "battle-pulse.m4a": {
+    "integrated_lufs": -30.1,
+    "true_peak_dbfs": -14.9,
+    "duration_seconds": 48,
+    "bpm": 100,
+    "loop": true,
+    "clipped_samples": 0,
+    "boundary_step": 0.010009765625,
+    "ordinary_99_9_percentile_step": 0.0352783203125
+  }
+}

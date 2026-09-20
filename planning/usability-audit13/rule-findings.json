@@ -1,0 +1,712 @@
+{
+  "snapshot": {
+    "keep": 7,
+    "capacity": 11363,
+    "resources": {
+      "gold": 121.20815733333473,
+      "wood": 5094.272211999999,
+      "stone": 6512.670609333333,
+      "food": 9131.608258
+    },
+    "gems": 1021,
+    "campaign": 10,
+    "buildersFree": 2,
+    "buildersTotal": 2,
+    "levels": {
+      "cavalry": 5,
+      "knight": 2
+    },
+    "army": {
+      "infantry": 0,
+      "archer": 2,
+      "cavalry": 4,
+      "cannon": 2,
+      "spearman": 0,
+      "shieldbearer": 5,
+      "scout": 2,
+      "crossbow": 8,
+      "ram": 0,
+      "trebuchet": 4,
+      "healer": 5,
+      "grenadier": 8,
+      "knight": 12
+    },
+    "income": {
+      "gold": 233.20000000000002,
+      "wood": 337.08000000000004,
+      "stone": 205.64000000000001,
+      "food": 129.32
+    },
+    "storeCount": 1,
+    "storeLimit": 3,
+    "fleet": [
+      {
+        "id": "ship-1789798480431-56",
+        "kind": "cutter",
+        "level": 1,
+        "voyage": {
+          "route": "coast",
+          "startedAt": 1789859965748,
+          "readyAt": 1789860145748,
+          "reward": {
+            "gold": 25,
+            "wood": 110,
+            "stone": 0,
+            "food": 65
+          }
+        }
+      },
+      {
+        "id": "ship-1789799954235-73",
+        "kind": "galley",
+        "level": 1,
+        "voyage": {
+          "route": "coast",
+          "startedAt": 1789859967379,
+          "readyAt": 1789860147379,
+          "reward": {
+            "gold": 25,
+            "wood": 110,
+            "stone": 0,
+            "food": 65
+          }
+        }
+      },
+      {
+        "id": "ship-1789803176430-172",
+        "kind": "bombard",
+        "level": 4
+      },
+      {
+        "id": "ship-1789832748351-273",
+        "kind": "bombard",
+        "level": 1,
+        "voyage": {
+          "route": "coast",
+          "startedAt": 1789859974680,
+          "readyAt": 1789860154680,
+          "reward": {
+            "gold": 25,
+            "wood": 110,
+            "stone": 0,
+            "food": 65
+          }
+        }
+      }
+    ]
+  },
+  "upgrades": [
+    {
+      "id": "keep",
+      "kind": "keep",
+      "level": 7,
+      "cost": {
+        "gold": 11489,
+        "wood": 5540,
+        "stone": 6565,
+        "food": 3693
+      },
+      "uiReason": "Expand your storehouses first",
+      "prerequisite": "Complete a level 7 quarry",
+      "costExceedsCapacity": true
+    },
+    {
+      "id": "b-1789792882467-1",
+      "kind": "barracks",
+      "level": 7,
+      "cost": {
+        "gold": 2416,
+        "wood": 1718,
+        "stone": 1074,
+        "food": 1127
+      },
+      "uiReason": "Keep level 8 required",
+      "prerequisite": null,
+      "costExceedsCapacity": false
+    },
+    {
+      "id": "b-1789793614281-2",
+      "kind": "quarry",
+      "level": 6,
+      "cost": {
+        "gold": 1091,
+        "wood": 872,
+        "stone": 0,
+        "food": 587
+      },
+      "uiReason": "More resources needed",
+      "prerequisite": null,
+      "costExceedsCapacity": false
+    },
+    {
+      "id": "b-1789803393165-197",
+      "kind": "quarry",
+      "level": 3,
+      "cost": {
+        "gold": 266,
+        "wood": 213,
+        "stone": 0,
+        "food": 143
+      },
+      "uiReason": "More resources needed",
+      "prerequisite": null,
+      "costExceedsCapacity": false
+    },
+    {
+      "id": "b-1789832998558-313",
+      "kind": "storehouse",
+      "level": 7,
+      "cost": {
+        "gold": 3758,
+        "wood": 2953,
+        "stone": 1611,
+        "food": 1074
+      },
+      "uiReason": "Keep level 8 required",
+      "prerequisite": null,
+      "costExceedsCapacity": false
+    }
+  ],
+  "troops": [
+    {
+      "kind": "infantry",
+      "name": "Infantry",
+      "unlock": 1,
+      "owned": 0,
+      "level": 1,
+      "hp": 115,
+      "damage": 13,
+      "range": 0.85,
+      "abilities": [
+        [
+          3,
+          "Shield drill",
+          "10% less incoming damage."
+        ],
+        [
+          6,
+          "Cleave",
+          "Strikes one nearby enemy for 35% damage."
+        ],
+        [
+          9,
+          "Veteran guard",
+          "25% less incoming damage."
+        ]
+      ]
+    },
+    {
+      "kind": "archer",
+      "name": "Archers",
+      "unlock": 1,
+      "owned": 2,
+      "level": 1,
+      "hp": 64,
+      "damage": 12,
+      "range": 2.65,
+      "abilities": [
+        [
+          3,
+          "Longbow",
+          "Adds 0.35 attack range."
+        ],
+        [
+          6,
+          "Quick draw",
+          "Attack cooldown is 20% shorter."
+        ],
+        [
+          9,
+          "Split volley",
+          "Hits a second nearby enemy for 60% damage."
+        ]
+      ]
+    },
+    {
+      "kind": "cavalry",
+      "name": "Cavalry",
+      "unlock": 2,
+      "owned": 4,
+      "level": 5,
+      "hp": 170,
+      "damage": 21,
+      "range": 0.85,
+      "abilities": [
+        [
+          3,
+          "Spurred charge",
+          "Moves 12% faster."
+        ],
+        [
+          6,
+          "Impact charge",
+          "First attack deals 75% extra damage."
+        ],
+        [
+          9,
+          "Tower riders",
+          "Deals 25% extra damage to defensive weapons."
+        ]
+      ]
+    },
+    {
+      "kind": "cannon",
+      "name": "Cannons",
+      "unlock": 2,
+      "owned": 2,
+      "level": 1,
+      "hp": 75,
+      "damage": 21,
+      "range": 3.5,
+      "abilities": [
+        [
+          3,
+          "Long barrel",
+          "Adds 0.5 attack range."
+        ],
+        [
+          6,
+          "Blast shell",
+          "Nearby enemies take 45% blast damage."
+        ],
+        [
+          9,
+          "Siege ammunition",
+          "Deals 35% extra damage to structures."
+        ]
+      ]
+    },
+    {
+      "kind": "spearman",
+      "name": "Spearmen",
+      "unlock": 1,
+      "owned": 0,
+      "level": 1,
+      "hp": 125,
+      "damage": 15,
+      "range": 1.3,
+      "abilities": [
+        [
+          3,
+          "Long pikes",
+          "Adds 0.3 attack range."
+        ],
+        [
+          6,
+          "Cavalry counter",
+          "Deals triple damage to cavalry and knights."
+        ],
+        [
+          9,
+          "Braced formation",
+          "25% less incoming damage."
+        ]
+      ]
+    },
+    {
+      "kind": "shieldbearer",
+      "name": "Shieldbearers",
+      "unlock": 2,
+      "owned": 5,
+      "level": 1,
+      "hp": 220,
+      "damage": 9,
+      "range": 0.85,
+      "abilities": [
+        [
+          3,
+          "Reinforced shield",
+          "Adds 15% maximum health."
+        ],
+        [
+          6,
+          "Shield cover",
+          "Nearby allies take 12% less damage."
+        ],
+        [
+          9,
+          "Bulwark",
+          "Shield protection reduces incoming damage by a further 30%."
+        ]
+      ]
+    },
+    {
+      "kind": "scout",
+      "name": "Scouts",
+      "unlock": 2,
+      "owned": 2,
+      "level": 1,
+      "hp": 80,
+      "damage": 16,
+      "range": 0.85,
+      "abilities": [
+        [
+          3,
+          "Fleet foot",
+          "Moves 15% faster."
+        ],
+        [
+          6,
+          "Supply raider",
+          "Deals 65% extra damage to production buildings."
+        ],
+        [
+          9,
+          "Relentless raids",
+          "Attack cooldown is 30% shorter."
+        ]
+      ]
+    },
+    {
+      "kind": "crossbow",
+      "name": "Crossbowmen",
+      "unlock": 3,
+      "owned": 8,
+      "level": 1,
+      "hp": 78,
+      "damage": 26,
+      "range": 3,
+      "abilities": [
+        [
+          3,
+          "Heavy bow",
+          "Adds 0.4 attack range."
+        ],
+        [
+          6,
+          "Armor piercing",
+          "Deals 40% extra damage to armored defenders."
+        ],
+        [
+          9,
+          "Precision volley",
+          "Every third attack deals 75% extra damage."
+        ]
+      ]
+    },
+    {
+      "kind": "ram",
+      "name": "Battering rams",
+      "unlock": 3,
+      "owned": 0,
+      "level": 1,
+      "hp": 320,
+      "damage": 22,
+      "range": 0.9,
+      "abilities": [
+        [
+          3,
+          "Heavy frame",
+          "Adds 20% maximum health."
+        ],
+        [
+          6,
+          "Gate breaker",
+          "Deals sixfold damage to walls and gates."
+        ],
+        [
+          9,
+          "Breach shock",
+          "Nearby enemies take 50% impact damage."
+        ]
+      ]
+    },
+    {
+      "kind": "trebuchet",
+      "name": "Trebuchets",
+      "unlock": 5,
+      "owned": 4,
+      "level": 1,
+      "hp": 115,
+      "damage": 46,
+      "range": 5.2,
+      "abilities": [
+        [
+          3,
+          "Long counterweight",
+          "Adds 0.75 attack range."
+        ],
+        [
+          6,
+          "Shattering boulder",
+          "Wide impacts deal 65% damage to nearby enemies."
+        ],
+        [
+          9,
+          "Veteran crew",
+          "Attack cooldown is 25% shorter."
+        ]
+      ]
+    },
+    {
+      "kind": "healer",
+      "name": "Field medics",
+      "unlock": 4,
+      "owned": 5,
+      "level": 1,
+      "hp": 82,
+      "damage": 0,
+      "heal": 20,
+      "range": 2.7,
+      "abilities": [
+        [
+          3,
+          "Field reach",
+          "Adds 0.4 healing range."
+        ],
+        [
+          6,
+          "Shared care",
+          "A nearby wounded ally receives a 50% follow-up heal."
+        ],
+        [
+          9,
+          "Emergency care",
+          "Heals 40% more when a patient is below 35% health."
+        ]
+      ]
+    },
+    {
+      "kind": "grenadier",
+      "name": "Grenadiers",
+      "unlock": 5,
+      "owned": 8,
+      "level": 1,
+      "hp": 100,
+      "damage": 24,
+      "range": 2.4,
+      "abilities": [
+        [
+          3,
+          "Long throw",
+          "Adds 0.35 attack range."
+        ],
+        [
+          6,
+          "Shrapnel",
+          "Wider blasts deal 90% damage to nearby enemies."
+        ],
+        [
+          9,
+          "Rapid bombardment",
+          "Attack cooldown is 25% shorter."
+        ]
+      ]
+    },
+    {
+      "kind": "knight",
+      "name": "Royal knights",
+      "unlock": 6,
+      "owned": 12,
+      "level": 2,
+      "hp": 270,
+      "damage": 30,
+      "range": 0.95,
+      "abilities": [
+        [
+          3,
+          "Plate armor",
+          "Adds 15% maximum health."
+        ],
+        [
+          6,
+          "Fortress assault",
+          "Deals 50% extra damage to defensive weapons."
+        ],
+        [
+          9,
+          "Iron resolve",
+          "Takes 25% less damage."
+        ]
+      ]
+    }
+  ],
+  "progression": [
+    {
+      "keep": 1,
+      "maxStorageCount": 1,
+      "maxStorageLevel": 1,
+      "capacity": 1550,
+      "nextKeepCost": {
+        "gold": 476,
+        "wood": 230,
+        "stone": 272,
+        "food": 153
+      },
+      "nextStoreCost": {
+        "gold": 224,
+        "wood": 176,
+        "stone": 96,
+        "food": 64
+      },
+      "reachableAtMaxStores": true
+    },
+    {
+      "keep": 2,
+      "maxStorageCount": 1,
+      "maxStorageLevel": 2,
+      "capacity": 2200,
+      "nextKeepCost": {
+        "gold": 809,
+        "wood": 390,
+        "stone": 462,
+        "food": 260
+      },
+      "nextStoreCost": {
+        "gold": 358,
+        "wood": 282,
+        "stone": 154,
+        "food": 102
+      },
+      "reachableAtMaxStores": true
+    },
+    {
+      "keep": 3,
+      "maxStorageCount": 1,
+      "maxStorageLevel": 3,
+      "capacity": 3050,
+      "nextKeepCost": {
+        "gold": 1376,
+        "wood": 663,
+        "stone": 786,
+        "food": 442
+      },
+      "nextStoreCost": {
+        "gold": 573,
+        "wood": 451,
+        "stone": 246,
+        "food": 164
+      },
+      "reachableAtMaxStores": true
+    },
+    {
+      "keep": 4,
+      "maxStorageCount": 2,
+      "maxStorageLevel": 4,
+      "capacity": 6900,
+      "nextKeepCost": {
+        "gold": 2339,
+        "wood": 1128,
+        "stone": 1336,
+        "food": 752
+      },
+      "nextStoreCost": {
+        "gold": 918,
+        "wood": 721,
+        "stone": 393,
+        "food": 262
+      },
+      "reachableAtMaxStores": true
+    },
+    {
+      "keep": 5,
+      "maxStorageCount": 2,
+      "maxStorageLevel": 5,
+      "capacity": 9850,
+      "nextKeepCost": {
+        "gold": 3976,
+        "wood": 1917,
+        "stone": 2272,
+        "food": 1278
+      },
+      "nextStoreCost": {
+        "gold": 1468,
+        "wood": 1153,
+        "stone": 629,
+        "food": 419
+      },
+      "reachableAtMaxStores": true
+    },
+    {
+      "keep": 6,
+      "maxStorageCount": 2,
+      "maxStorageLevel": 6,
+      "capacity": 14150,
+      "nextKeepCost": {
+        "gold": 6759,
+        "wood": 3259,
+        "stone": 3862,
+        "food": 2172
+      },
+      "nextStoreCost": {
+        "gold": 2349,
+        "wood": 1845,
+        "stone": 1007,
+        "food": 671
+      },
+      "reachableAtMaxStores": true
+    },
+    {
+      "keep": 7,
+      "maxStorageCount": 3,
+      "maxStorageLevel": 7,
+      "capacity": 29589,
+      "nextKeepCost": {
+        "gold": 11489,
+        "wood": 5540,
+        "stone": 6565,
+        "food": 3693
+      },
+      "nextStoreCost": {
+        "gold": 3758,
+        "wood": 2953,
+        "stone": 1611,
+        "food": 1074
+      },
+      "reachableAtMaxStores": true
+    },
+    {
+      "keep": 8,
+      "maxStorageCount": 3,
+      "maxStorageLevel": 8,
+      "capacity": 43507,
+      "nextKeepCost": {
+        "gold": 19532,
+        "wood": 9417,
+        "stone": 11161,
+        "food": 6278
+      },
+      "nextStoreCost": {
+        "gold": 6013,
+        "wood": 4724,
+        "stone": 2577,
+        "food": 1718
+      },
+      "reachableAtMaxStores": true
+    },
+    {
+      "keep": 9,
+      "maxStorageCount": 3,
+      "maxStorageLevel": 9,
+      "capacity": 64259,
+      "nextKeepCost": {
+        "gold": 33205,
+        "wood": 16009,
+        "stone": 18974,
+        "food": 10673
+      },
+      "nextStoreCost": {
+        "gold": 9621,
+        "wood": 7559,
+        "stone": 4123,
+        "food": 2749
+      },
+      "reachableAtMaxStores": true
+    }
+  ],
+  "rawTimeFields": {
+    "lastTick": 1789860084781
+  },
+  "reducerChecks": [
+    {
+      "kind": "keep",
+      "fundedUIReason": "Expand your storehouses first",
+      "fundedReducerResult": "Complete a level 7 quarry"
+    },
+    {
+      "kind": "storehouse",
+      "fundedUIReason": "Keep level 8 required",
+      "fundedReducerResult": "Upgrade your keep first."
+    }
+  ]
+}

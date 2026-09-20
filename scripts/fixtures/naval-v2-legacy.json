@@ -1,0 +1,168 @@
+{
+  "input": {
+    "defense": {
+      "name": "Twin forts",
+      "level": 3,
+      "buildings": [
+        {
+          "id": "keep",
+          "kind": "keep",
+          "x": 4,
+          "y": 4,
+          "level": 3
+        },
+        {
+          "id": "left-tower",
+          "kind": "tower",
+          "x": 1,
+          "y": 1,
+          "level": 3
+        },
+        {
+          "id": "right-tower",
+          "kind": "tower",
+          "x": 7,
+          "y": 7,
+          "level": 3
+        },
+        {
+          "id": "barracks",
+          "kind": "barracks",
+          "x": 4,
+          "y": 2,
+          "level": 2
+        }
+      ]
+    },
+    "army": {
+      "infantry": 0,
+      "archer": 4,
+      "cavalry": 0,
+      "cannon": 0,
+      "spearman": 0,
+      "shieldbearer": 8,
+      "scout": 0,
+      "crossbow": 0,
+      "ram": 0,
+      "healer": 4,
+      "grenadier": 0,
+      "knight": 0
+    },
+    "bonus": 1,
+    "front": "left",
+    "rulesVersion": 4,
+    "orders": [
+      {
+        "kind": "shieldbearer",
+        "x": -1,
+        "y": 2,
+        "time": 0
+      },
+      {
+        "kind": "shieldbearer",
+        "x": -1,
+        "y": 2,
+        "time": 0
+      },
+      {
+        "kind": "shieldbearer",
+        "x": -1,
+        "y": 2,
+        "time": 0
+      },
+      {
+        "kind": "shieldbearer",
+        "x": -1,
+        "y": 2,
+        "time": 0
+      },
+      {
+        "kind": "archer",
+        "x": -1,
+        "y": 2,
+        "time": 0
+      },
+      {
+        "kind": "archer",
+        "x": -1,
+        "y": 2,
+        "time": 0
+      },
+      {
+        "kind": "healer",
+        "x": -1,
+        "y": 2,
+        "time": 0
+      },
+      {
+        "kind": "healer",
+        "x": -1,
+        "y": 2,
+        "time": 0
+      },
+      {
+        "kind": "shieldbearer",
+        "x": 9,
+        "y": 6,
+        "time": 0
+      },
+      {
+        "kind": "shieldbearer",
+        "x": 9,
+        "y": 6,
+        "time": 0
+      },
+      {
+        "kind": "shieldbearer",
+        "x": 9,
+        "y": 6,
+        "time": 0
+      },
+      {
+        "kind": "shieldbearer",
+        "x": 9,
+        "y": 6,
+        "time": 0
+      },
+      {
+        "kind": "archer",
+        "x": 9,
+        "y": 6,
+        "time": 0
+      },
+      {
+        "kind": "archer",
+        "x": 9,
+        "y": 6,
+        "time": 0
+      },
+      {
+        "kind": "healer",
+        "x": 9,
+        "y": 6,
+        "time": 0
+      },
+      {
+        "kind": "healer",
+        "x": 9,
+        "y": 6,
+        "time": 0
+      }
+    ],
+    "unitLevels": {
+      "shieldbearer": 2,
+      "healer": 2,
+      "archer": 2
+    },
+    "seed": 47359,
+    "navalVersion": 2,
+    "navalSupport": {
+      "id": "legacy-galley",
+      "kind": "galley",
+      "level": 2
+    },
+    "healerTacticsVersion": 1,
+    "troopAbilitiesVersion": 1
+  },
+  "sha256": "c0d08bc43bd7472f89a880b5a3bae70e08ca90eaec1707067435a70310d122ec"
+}

@@ -1,0 +1,25 @@
+{
+  "name": "stonewake-service",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "rules": "node ../scripts/export-server-rules.cjs",
+    "test": "node --test test/*.test.mjs",
+    "dev": "wrangler dev",
+    "check": "wrangler deploy --dry-run",
+    "types": "wrangler types"
+  },
+  "dependencies": {
+    "@apple/app-store-server-library": "3.1.0",
+    "jose": "6.2.12"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "5.20260919.1",
+    "@types/node": "^26.6.2",
+    "acorn": "8.18.0",
+    "eslint-scope": "9.1.2",
+    "miniflare": "4.20260730.0",
+    "wrangler": "4.135.0"
+  }
+}

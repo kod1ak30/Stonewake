@@ -1,0 +1,169 @@
+{
+  "build": 11,
+  "activeAssets": [
+    {
+      "file": "Stonewake/Web/art/keep-tiers-directions-v11.png",
+      "bytes": 2237472,
+      "sha256": "61a065190f11754b4c6412d5b13b14f64125b8d9a5e9c4a9447b0338ddcb599f",
+      "dimensions": [
+        1448,
+        1086
+      ],
+      "layout": "4 directions x 3 architecture tiers",
+      "kind": "keep",
+      "levels": "1-3 early; 4-6 developed; 7-10 grand",
+      "prompt": "client/keep-tiers-v11-prompt.txt"
+    },
+    {
+      "file": "Stonewake/Web/art/cottage-tiers-directions-v11.png",
+      "bytes": 2288966,
+      "sha256": "063eaa1621c8de5ba0119eb76edcb2ad3a55a68ce54c03557bbbdc640007ec4d",
+      "dimensions": [
+        1448,
+        1086
+      ],
+      "layout": "4 directions x 3 architecture tiers",
+      "kind": "cottage",
+      "levels": "1-3 early; 4-6 developed; 7-10 grand",
+      "prompt": "client/cottage-tiers-v11-prompt.txt"
+    },
+    {
+      "file": "Stonewake/Web/art/barracks-tiers-directions-v11.png",
+      "bytes": 2428930,
+      "sha256": "e3cfc6077143ed53ed5b8f40a4c5bf6a46eb1f20e0abd5926b64c4ff9646447b",
+      "dimensions": [
+        1448,
+        1086
+      ],
+      "layout": "4 directions x 3 architecture tiers",
+      "kind": "barracks",
+      "levels": "1-3 early; 4-6 developed; 7-10 grand",
+      "prompt": "client/barracks-tiers-v11-prompt.txt"
+    },
+    {
+      "file": "Stonewake/Web/art/storehouse-tiers-directions-v11.png",
+      "bytes": 2495259,
+      "sha256": "8eb3ef856a4ff50f46c9a90044c0da2d169472a1ecc6349c8caecc685fc16229",
+      "dimensions": [
+        1448,
+        1086
+      ],
+      "layout": "4 directions x 3 architecture tiers",
+      "kind": "storehouse",
+      "levels": "1-3 early; 4-6 developed; 7-10 grand",
+      "prompt": "client/storehouse-tiers-v11-prompt.txt"
+    },
+    {
+      "file": "Stonewake/Web/art/harbor-tiers-directions-v11.png",
+      "bytes": 2543746,
+      "sha256": "85f070458a4b9ff7d561e4a84e5e5d184fb18751b6db8946d45df0a155fc40e1",
+      "dimensions": [
+        1448,
+        1086
+      ],
+      "layout": "4 directions x 3 architecture tiers",
+      "kind": "harbor",
+      "levels": "1-3 early; 4-6 developed; 7-10 grand",
+      "prompt": "client/harbor-tiers-v11-prompt.txt"
+    },
+    {
+      "file": "Stonewake/Web/art/workers-v11.png",
+      "bytes": 908085,
+      "sha256": "89d04402226259ddf38126c3b7d2166b8fe7f22338bc33f8bc0eabcdb43eba18",
+      "dimensions": [
+        1448,
+        1086
+      ],
+      "layout": "4 columns x 6 rows",
+      "usage": "Farmer, woodcutter and smith walk/work cycles",
+      "prompt": "client/workers-v11-prompt.txt"
+    },
+    {
+      "file": "Stonewake/Web/art/deaths-v11.png",
+      "bytes": 1532152,
+      "sha256": "272432142cd93426df2dea650c7022d314f62ee646074c64923bf914448ab600",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "layout": "4 columns x 4 rows",
+      "usage": "Infantry, archer, cavalry and cannon defeat sequences",
+      "prompt": "client/deaths-v11-prompt.txt"
+    },
+    {
+      "file": "Stonewake/Web/art/civic-v11.png",
+      "bytes": 1864797,
+      "sha256": "55dfd1a8f57114890b585d6d24f6c5986e842fdda6a0f65b57f623a716fbd638",
+      "dimensions": [
+        1086,
+        1448
+      ],
+      "layout": "3 columns x 4 rows",
+      "usage": "Market, waterfront, homes and gardens project stages",
+      "prompt": "client/civic-v11-prompt.txt"
+    },
+    {
+      "file": "Stonewake/Web/art/pikes-v11.png",
+      "bytes": 1181575,
+      "sha256": "9242a63d18fd385e9c483178a29c92c55e63cfe87dd911c10f774023ba9208d4",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "layout": "4 columns x 4 rows",
+      "usage": "Spearman walk/thrust and medic walk/heal",
+      "prompt": "client/pikes-v11-prompt.txt"
+    },
+    {
+      "file": "Stonewake/Web/art/guards-v11.png",
+      "bytes": 1332607,
+      "sha256": "dcf90613b3f5a20afe38e239ace04f5c7242cc808dd735b3cfea14d8c366f223",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "layout": "4 columns x 4 rows",
+      "usage": "Shieldbearer and scout walk/attack",
+      "prompt": "client/guards-v11-prompt.txt"
+    },
+    {
+      "file": "Stonewake/Web/art/missiles-v11.png",
+      "bytes": 1169761,
+      "sha256": "ea2fa50d33d9c6dc1b71e9656a57a28da3b209da40c052f490593cde5b0f52c2",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "layout": "4 columns x 4 rows",
+      "usage": "Crossbow and grenadier walk/attack",
+      "prompt": "client/missiles-v11-prompt.txt"
+    },
+    {
+      "file": "Stonewake/Web/art/engines-v11.png",
+      "bytes": 1871290,
+      "sha256": "1b65d64351fb5bde532c5b730370d801bafc93fdc6b8eba1b8ae297c71a08d2c",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "layout": "4 columns x 4 rows",
+      "usage": "Knight and battering ram walk/attack",
+      "prompt": "client/engines-v11-prompt.txt"
+    }
+  ],
+  "activeBytes": 21854640,
+  "metadata": "client/v11-atlas-metadata.json",
+  "metadataNotes": "Read-only alpha component measurements. Directional buildings use silhouette clipping to prevent neighboring-row bleed. Original generated files remain in .codex/generated_images; each prompt file records its original path.",
+  "retainedReferences": [
+    "Stonewake/Web/art/keep-directions-v11.png",
+    "Stonewake/Web/art/cottage-directions-v11.png",
+    "Stonewake/Web/art/barracks-directions-v11.png",
+    "Stonewake/Web/art/storehouse-directions-v11.png",
+    "Stonewake/Web/art/harbor-directions-v11.png"
+  ],
+  "fallbacks": [
+    "Other building kinds retain existing directional treatment.",
+    "Specialist defeats use own character artwork in a fall/fade; four common types have painted defeat frames.",
+    "Trebuchet retains existing painted art and recoil animation."
+  ]
+}
